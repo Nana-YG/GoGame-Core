@@ -196,7 +196,7 @@ CMAKE_PROJECT_DESCRIPTION:STATIC=
 CMAKE_PROJECT_HOMEPAGE_URL:STATIC=
 
 //Value Computed by CMake
-CMAKE_PROJECT_NAME:STATIC=WuZiQi
+CMAKE_PROJECT_NAME:STATIC=MyAlphaGo
 
 //Value Computed by CMake
 CMAKE_PROJECT_VERSION:STATIC=3.11.3
@@ -327,6 +327,15 @@ JSON_MultipleHeaders:BOOL=ON
 
 //Include as system headers (skip for clang-tidy).
 JSON_SystemInclude:BOOL=OFF
+
+//Value Computed by CMake
+MyAlphaGo_BINARY_DIR:STATIC=/home/nana/Gyyyyy/Projects/MyAlphaGo/cpp/cmake-build-debug
+
+//Value Computed by CMake
+MyAlphaGo_IS_TOP_LEVEL:STATIC=ON
+
+//Value Computed by CMake
+MyAlphaGo_SOURCE_DIR:STATIC=/home/nana/Gyyyyy/Projects/MyAlphaGo/cpp
 
 //Value Computed by CMake
 WuZiQi_BINARY_DIR:STATIC=/home/nana/Gyyyyy/Projects/MyAlphaGo/cpp/cmake-build-debug

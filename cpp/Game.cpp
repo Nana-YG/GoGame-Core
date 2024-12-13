@@ -6,7 +6,7 @@
 #include "Board.h"
 #include "Config.h"
 
-Game::Game(Player *playeB, Player *playerW, Board *board) {
+Game::Game(Player *playeB, Player *playerW) {
     this->playeB = playeB;
     this->playerW = playerW;
 }
@@ -29,16 +29,16 @@ void Game::addBoard(Board board) {
 }
 
 Board Game::getBoardFromHist(int index) {
-    return history[index];
+    return this->history[index];
 }
 
 bool Game::superko(Board board) {
     for (int i = 0; i < moveCount; i++) {
-        if (board.equalsTo(history[i])) {
-            return false; // Repeated board state
+        if (board.equalsTo(getBoardFromHist(i))) {
+            return true; // Repeated board state
         }
     }
-    return true;
+    return false;
 }
 
 

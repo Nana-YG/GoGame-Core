@@ -1,7 +1,9 @@
-cmake_minimum_required(VERSION 3.29)
-project(WuZiQi)
+cmake_minimum_required(VERSION 3.28)
+project(MyAlphaGo)
 
 set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_BUILD_TYPE Debug)
+
 
 # 引入 FetchContent 模块
 include(FetchContent)

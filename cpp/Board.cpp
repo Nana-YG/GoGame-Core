@@ -19,6 +19,10 @@ Board::Board(Game* game) {
     this->init(config.boardSize);
 }
 
+void Board::setGame(Game* game) {
+    this->game = game;
+}
+
 void Board::init(int size) {
     this->size = size;
     this->gameOver = false;
@@ -33,7 +37,7 @@ bool Board::move(StonePosition *pos, spot_color color) {
     if (game->superko(newBoard)) {
         return false;
     }
-    game->addBoard(newBoard);
+    this->board = newBoard.board;
     return true;
 }
 

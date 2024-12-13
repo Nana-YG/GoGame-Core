@@ -41,6 +41,7 @@ private:
 public:
     Board();
     Board(Game* game);                                  // Constructor
+    void setGame(Game* game);
     void init(int size);								// Initialize Go Board
     bool move(StonePosition * pos, spot_color color);	// Play a move of <color> at <*pos>, return 1 if proceeded, return 0 if illegal
     bool legal(StonePosition *pos, spot_color color);	// Is a move at <row, col> legal

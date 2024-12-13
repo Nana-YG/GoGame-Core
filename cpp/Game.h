@@ -21,9 +21,8 @@ private:
     int moveCount;
     std::vector<Board> history;
 
-
 public:
-    Game(Player * playerB, Player * playerW, Board * board);
+    Game(Player * playerB, Player * playerW);
     void init();
     int getMoveCount();
     void addBoard(Board board);
