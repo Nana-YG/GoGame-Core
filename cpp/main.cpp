@@ -1,6 +1,9 @@
-#include <iostream>
+#include <stdio.h>
+#include <stdint.h>
+#include <time.h>
+
+
 
 int main() {
-    std::cout << "Hello, World!" << std::endl;
-    return 0;
+
 }
