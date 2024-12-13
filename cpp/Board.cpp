@@ -13,23 +13,13 @@ Board::Board() {
     this->init(config.boardSize);
 }
 
-Board::Board(Game* game) {
-    this->game = game;
-    const Config& config = Config::getInstance();
-    this->init(config.boardSize);
-}
-
-void Board::setGame(Game* game) {
-    this->game = game;
-}
-
 void Board::init(int size) {
     this->size = size;
     this->gameOver = false;
     this->board.resize(size, std::vector<spot_color>(size, EMPTY));
 }
 
-bool Board::move(StonePosition *pos, spot_color color) {
+bool Board::move(Game* game, StonePosition *pos, spot_color color) {
     if (!this->legal(pos, color)) {
         return false;
     }

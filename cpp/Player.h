@@ -23,7 +23,7 @@ public:
     spot_color getColor() const;
 
     // Make a move on the board
-    bool makeMove(Board& board, StonePosition pos);
+    bool makeMove(Game* game, Board& board, StonePosition pos);
 };
 
 

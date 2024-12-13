@@ -33,17 +33,14 @@ typedef enum {
 class Board {
 
 private:
-    Game* game;
     std::vector<std::vector<spot_color>> board;
     int size;
     bool gameOver;
 
 public:
     Board();
-    Board(Game* game);                                  // Constructor
-    void setGame(Game* game);
     void init(int size);								// Initialize Go Board
-    bool move(StonePosition * pos, spot_color color);	// Play a move of <color> at <*pos>, return 1 if proceeded, return 0 if illegal
+    bool move(Game* game, StonePosition * pos, spot_color color);	// Play a move of <color> at <*pos>, return 1 if proceeded, return 0 if illegal
     bool legal(StonePosition *pos, spot_color color);	// Is a move at <row, col> legal
     Board update(StonePosition* pos, spot_color color); // Update the board for captures, liberties, etc.
     int getSize();										// Board size

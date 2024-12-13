@@ -19,13 +19,13 @@ spot_color Player::getColor() const {
 }
 
 // Make a move on the board
-bool Player::makeMove(Board& board, StonePosition pos) {
+bool Player::makeMove(Game* game, Board& board, StonePosition pos) {
     if (!board.legal(&pos, color)) {
         std::cout << "Move is illegal. Try again, " << name << "!" << std::endl;
         return false;
     }
 
-    if (board.move(&pos, color)) {
+    if (board.move(game, &pos, color)) {
         std::cout << name << " placed a stone at (" << pos.row << ", " << pos.col << ")." << std::endl;
         return true;
     }

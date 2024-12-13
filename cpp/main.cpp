@@ -3,6 +3,7 @@
 #include "Game.h"
 #include "Config.h"
 #include <iostream>
+#include <chrono>
 
 int main() {
     // Load configuration
@@ -17,7 +18,6 @@ int main() {
     Player player2("Bob", WHITE);
     Game game(&player1, &player2);
     game.init();
-    board.setGame(&game);
 
     // Start game loop
     bool gameOver = false;
@@ -34,11 +34,22 @@ int main() {
         std::cout << "Enter your move (row and column): ";
         std::cin >> row >> col;
 
+        auto start = std::chrono::high_resolution_clock::now();
+
         StonePosition pos = {row - 1, col - 1}; // Adjust for 0-based indexing
-        if (!currentPlayer->makeMove(board, pos)) {
+        if (!currentPlayer->makeMove(&game, board, pos)) {
             std::cout << "Invalid move. Try again." << std::endl;
             continue;
         }
+
+        // 停止计时
+        auto end = std::chrono::high_resolution_clock::now();
+        auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
+
+
+        // 输出时间消耗
+        std::cout << "Move processed in " << duration.count() << " μs." << std::endl;
+
 
         // Update game state
         game.addBoard(board);
