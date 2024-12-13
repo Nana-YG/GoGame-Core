@@ -5,24 +5,30 @@
 #ifndef GAME_H
 #define GAME_H
 
-#include "Player.h"
-#include "Board.h"
+#include <vector>
+#include <string>
 
+class Player;
+class Board;
 
 class Game {
 
 private:
     Player * playeB;
     Player * playerW;
-    Board * board;
     std::string rule;
-    float komi;
+    float komi{};
+    int moveCount;
+    std::vector<Board> history;
 
 
 public:
     Game(Player * playerB, Player * playerW, Board * board);
-    void init(Board *board);
-    void start();
+    void init();
+    int getMoveCount();
+    void addBoard(Board board);
+    Board getBoardFromHist(int index);
+    bool superko(Board board);
 };
 
 

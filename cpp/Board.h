@@ -8,6 +8,8 @@
 #include <vector>
 #include <string>
 
+class Game;
+
 /**
  * Represents the position of a stone on the board.
  */
@@ -31,17 +33,22 @@ typedef enum {
 class Board {
 
 private:
+    Game* game;
     std::vector<std::vector<spot_color>> board;
     int size;
     bool gameOver;
 
 public:
+    Board();
+    Board(Game* game);                                  // Constructor
     void init(int size);								// Initialize Go Board
-    bool legal(int row, int col, StonePosition * pos);	// Is a move at <row, col> legal
-    void move(StonePosition * pos, spot_color color);	// Play a move of <color> at <*pos>
+    bool move(StonePosition * pos, spot_color color);	// Play a move of <color> at <*pos>, return 1 if proceeded, return 0 if illegal
+    bool legal(StonePosition *pos, spot_color color);	// Is a move at <row, col> legal
+    Board update(StonePosition* pos, spot_color color); // Update the board for captures, liberties, etc.
     int getSize();										// Board size
     bool isOver();										// Game is over
-    std::string showBoard();
+    std::string showBoard();                            // Print the board to a String
+    bool equalsTo(Board boardToCheck);                 // Check is this->board is equal to boardToCheck->board
 
 };
 

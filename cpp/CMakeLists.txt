@@ -22,14 +22,11 @@ add_executable(MyAlphaGo
         Game.h
         Board.cpp
         Board.h
-        config.cpp
-        config.h
+        Config.cpp
+        Config.h
         gtp.cpp
         gtp.h
 )
 
 # 链接 nlohmann/json 到 MyAlphaGo
 target_link_libraries(MyAlphaGo PRIVATE nlohmann_json::nlohmann_json)
-
-# 添加本地 include 目录
-target_include_directories(MyAlphaGo PRIVATE ./cpp)

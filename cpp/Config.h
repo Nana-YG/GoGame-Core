@@ -8,6 +8,11 @@
 #include <string>
 
 class Config {
+private:
+    Config() = default; // 私有构造函数
+    Config(const Config&) = delete; // 禁止拷贝
+    Config& operator=(const Config&) = delete; // 禁止赋值
+
 public:
     int boardSize = 19;     // default board size
     float komi = 6.5;      // default komi
@@ -15,7 +20,7 @@ public:
     std::string rule = "Chinese";
 
     // load configuration from ./config.json
-    bool Config::loadFromFile(const std::string& filePath);
+    bool loadFromFile(const std::string& filePath);
     static Config & getInstance();
 };
 

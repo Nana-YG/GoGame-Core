@@ -1,7 +1,7 @@
 //
 // Created by nana on 12/13/24.
 //
-#include "config.h"
+#include "Config.h"
 #include <nlohmann/json.hpp>
 #include <fstream>
 #include <iostream>
