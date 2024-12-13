@@ -1,0 +1,8 @@
+{
+  "Game": {
+    "BoardSize": 19,
+    "Komi": 6.5,
+    "Handicap": 0,
+    "Rule": "Japanese"
+  }
+}

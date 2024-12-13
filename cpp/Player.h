@@ -9,7 +9,6 @@
 
 class Player {
 public:
-    void init(Board *board);
     void move();
 };
 

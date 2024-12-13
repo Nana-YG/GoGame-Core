@@ -15,10 +15,13 @@ private:
     Player * playeB;
     Player * playerW;
     Board * board;
+    std::string rule;
+    float komi;
 
 
 public:
     Game(Player * playerB, Player * playerW, Board * board);
+    void init(Board *board);
     void start();
 };
 

@@ -6,6 +6,7 @@
 #define BOARD_H
 
 #include <vector>
+#include <string>
 
 /**
  * Represents the position of a stone on the board.
@@ -35,7 +36,7 @@ private:
     bool gameOver;
 
 public:
-    void init();										// Initialize Go Board
+    void init(int size);								// Initialize Go Board
     bool legal(int row, int col, StonePosition * pos);	// Is a move at <row, col> legal
     void move(StonePosition * pos, spot_color color);	// Play a move of <color> at <*pos>
     int getSize();										// Board size

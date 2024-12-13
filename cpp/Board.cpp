@@ -6,7 +6,7 @@
 #include <sstream>
 #include <string>
 
-void Board::init() {
+void Board::init(int size) {
     this->size = 19;
     this->gameOver = false;
     this->board.resize(size, std::vector<spot_color>(size, EMPTY));;

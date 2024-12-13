@@ -3,12 +3,33 @@ project(WuZiQi)
 
 set(CMAKE_CXX_STANDARD 20)
 
-add_executable(WuZiQi main.cpp
+# 引入 FetchContent 模块
+include(FetchContent)
+
+# 配置 nlohmann/json 的下载和引入
+FetchContent_Declare(
+        json
+        URL https://github.com/nlohmann/json/releases/download/v3.11.3/json.tar.xz
+)
+FetchContent_MakeAvailable(json)
+
+# 添加可执行文件
+add_executable(MyAlphaGo
+        main.cpp
         Player.cpp
         Player.h
         Game.cpp
         Game.h
         Board.cpp
-        Board.h)
+        Board.h
+        config.cpp
+        config.h
+        gtp.cpp
+        gtp.h
+)
 
-include_directories(./cpp)
+# 链接 nlohmann/json 到 MyAlphaGo
+target_link_libraries(MyAlphaGo PRIVATE nlohmann_json::nlohmann_json)
+
+# 添加本地 include 目录
+target_include_directories(MyAlphaGo PRIVATE ./cpp)
