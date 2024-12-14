@@ -14,9 +14,9 @@ int main() {
 
     // Initialize game
     Board board;
-    Player player1("Alice", BLACK);
-    Player player2("Bob", WHITE);
-    Game game(&player1, &player2);
+    Player playerB("Alice", BLACK);
+    Player playerW("Bob", WHITE);
+    Game game(&playerB, &playerW);
     game.init();
 
     // Start game loop
@@ -26,7 +26,7 @@ int main() {
         std::cout << board.showBoard();
 
         // Current player makes a move
-        Player* currentPlayer = (game.getMoveCount() % 2 == 0) ? &player1 : &player2;
+        Player* currentPlayer = (game.getMoveCount() % 2 == 0) ? &playerB : &playerW;
         std::cout << currentPlayer->getName() << "'s turn ("
                   << (currentPlayer->getColor() == BLACK ? "BLACK" : "WHITE") << "):" << std::endl;
 

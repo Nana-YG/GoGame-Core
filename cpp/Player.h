@@ -26,7 +26,4 @@ public:
     bool makeMove(Game* game, Board& board, StonePosition pos);
 };
 
-
-
-
 #endif //PLAYER_H
