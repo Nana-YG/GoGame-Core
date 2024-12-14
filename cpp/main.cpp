@@ -42,12 +42,12 @@ int main() {
             continue;
         }
 
-        // 停止计时
+        // Stop timmer
         auto end = std::chrono::high_resolution_clock::now();
         auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
 
 
-        // 输出时间消耗
+        // Time Consume for history query
         std::cout << "Move processed in " << duration.count() << " μs." << std::endl;
 
 
