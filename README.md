@@ -2,6 +2,16 @@
 
 GTP Core is an open-source implementation of a light-weight Go game engine, built with C++ and designed for educational and collaborative purposes. This project includes essential game components such as players, a board, and a game manager, and is extendable for advanced features like AI integration or SGF file support.
 
+## Why Building Another Go Software?
+
+While there are many Go software options available, MyAlphaGo is designed with the following goals in mind:
+
+1. **Educational Value**: Most Go software like GNU Go already has massive code space with an integrated AI engine. This project serves as a resource for learning about Go game mechanics, C++ programming, and software design.
+2. **Modularity**: A clean and modular architecture allows for easy experimentation and feature additions.
+3. **Community Collaboration**: Encouraging open-source contributions to create a robust and flexible Go engine.
+4. **Customization**: Provides developers and enthusiasts the ability to tweak and adapt the software to their needs, whether for research or casual play.
+
+
 ## Features
 
 - **Game Mechanics:**
