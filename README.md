@@ -1,5 +1,7 @@
 # GTP Core
 
+GTP stands for Go Text Protocol.
+
 GTP Core is an open-source implementation of a light-weight Go game engine, built with C++ and designed for educational and collaborative purposes. This project includes essential game components such as players, a board, and a game manager, and is extendable for advanced features like AI integration or SGF file support.
 
 ## Why Building Another Go Software?
