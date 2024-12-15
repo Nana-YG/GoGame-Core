@@ -33,11 +33,11 @@ Board Game::getBoardFromHist(int index) {
 }
 
 bool Game::superko(Board board) {
-    for (int i = 0; i < moveCount; i++) {
-        if (board.equalsTo(getBoardFromHist(i))) {
-            return true; // Repeated board state
-        }
-    }
+    // for (int i = 0; i < moveCount; i++) {
+    //     if (board.equalsTo(getBoardFromHist(i))) {
+    //         return true; // Repeated board state
+    //     }
+    // }
     return false;
 }
 

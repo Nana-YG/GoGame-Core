@@ -8,11 +8,12 @@
 #include "Board.h"
 #include <vector>
 
-bool isConnected(Stone stone1, Stone stone2);
-Group combined(std::vector<Group> groups, int offset);
-Group combined(Group group1, Group group2, int offset);
-Group combined(Group group1, Group group2, Group group3, int offset);
-Group combined(Group group1, Group group2, Group group3, Group group4, int offset);
+Group* combined(std::vector<Group*> groups, int offset);
+Group* combined(Group* group1, Group* group2, int offset);
+Group* combined(Group* group1, Group* group2, Group* group3, int offset);
+Group* combined(Group* group1, Group* group2, Group* group3, Group* group4, int offset);
+
+void printGroups(Board board);
 
 
 #endif //GROUPUTIL_H

@@ -5,6 +5,8 @@
 #include <iostream>
 #include <chrono>
 
+#include "GroupUtil.h"
+
 int main() {
     // Load configuration
     Config& config = Config::getInstance();
@@ -22,6 +24,7 @@ int main() {
     // Start game loop
     bool gameOver = false;
     while (!gameOver) {
+
         // Display board
         std::cout << board.showBoard();
 
@@ -34,6 +37,7 @@ int main() {
         std::cout << "Enter your move (row and column): ";
         std::cin >> row >> col;
 
+        // Start timmer
         auto start = std::chrono::high_resolution_clock::now();
 
         StonePosition pos = {row - 1, col - 1}; // Adjust for 0-based indexing
@@ -41,6 +45,10 @@ int main() {
             std::cout << "Invalid move. Try again." << std::endl;
             continue;
         }
+
+        board.group();
+        std::cout << "Linked Board:" << std::endl;
+        printGroups(board);
 
         // Stop timmer
         auto end = std::chrono::high_resolution_clock::now();

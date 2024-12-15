@@ -5,6 +5,7 @@
 #include "Board.h"
 #include "Game.h"
 #include "Config.h"
+#include "GroupUtil.h"
 #include <sstream>
 #include <string>
 
@@ -13,10 +14,27 @@ Board::Board() {
     this->init(config.boardSize);
 }
 
+// Board::~Board() {
+//     for (int i = 0; i < size; ++i) {
+//         for (int j = 0; j < size; ++j) {
+//             delete this->board[i][j];
+//         }
+//     }
+// }
+
 void Board::init(int size) {
     this->size = size;
     this->gameOver = false;
-    this->board.resize(size, std::vector<spot_color>(size, EMPTY));
+    this->board.resize(size, std::vector<Stone*>(size, nullptr));
+    for (int i = 0; i < size; ++i) {
+        for (int j = 0; j < size; ++j) {
+            this->board[i][j] = new Stone();
+        }
+    }
+}
+
+void Board::clear() {
+
 }
 
 /**
@@ -46,7 +64,7 @@ bool Board::legal(StonePosition *pos, spot_color color) {
     }
 
     // Check if the spot is empty
-    if (this->board[pos->row][pos->col] != EMPTY) {
+    if (this->board[pos->row][pos->col]->color != EMPTY) {
         return false;
     }
 
@@ -56,7 +74,7 @@ bool Board::legal(StonePosition *pos, spot_color color) {
 
 Board Board::update(StonePosition *pos, spot_color color) {
     Board newBoard(*this);
-    newBoard.board[pos->row][pos->col] = color;
+    newBoard.board[pos->row][pos->col]->color = color;
     return newBoard;
 }
 
@@ -68,8 +86,47 @@ bool Board::isOver() {
     return gameOver;
 }
 
-void Board::group() {
+std::vector<std::vector<Stone*>> Board::getBoard() {
+    return board;
+}
 
+Group* Board::createNewGroup(int row, int col) {
+    Group* newGroup = new Group();
+    newGroup->liberties = 0;
+    newGroup->color = board[row][col]->color;
+
+    board[row][col]->group = newGroup;
+
+    newGroup->stones.push_back(board[row][col]);
+    return newGroup;
+}
+
+
+
+void Board::group() {
+    for (int i = 0; i < size; i++) {
+        for (int j = 0; j < size; j++) {
+            if (board[i][j]->color == EMPTY) {
+                continue;
+            }
+
+            Group* newGroup = createNewGroup(i, j);
+
+            if (i > 0) {
+                if (board[i][j]->color == board[i - 1][j]->color) {
+                    Group* combinedGroup = combined(board[i][j]->group, board[i - 1][j]->group, 2);
+                    // TODO remove the old groups from the list
+                }
+            }
+            if (j > 0) {
+                if (board[i][j]->color == board[i][j - 1]->color) {
+                    Group* combinedGroup = combined(board[i][j]->group, board[i][j - 1]->group, 2);
+                    //TODO remove the old groups from the list
+                }
+            }
+
+        }
+    }
 }
 
 
@@ -90,7 +147,7 @@ std::string Board::showBoard() {
         oss << (i + 1) << " ";
         if (i + 1 < 10) oss << " "; // If <row number> < 10, add on more space
         for (int j = 0; j < size; j++) {
-            switch (board[i][j]) {
+            switch (board[i][j]->color) {
                 case WHITE:
                     oss << "O "; // White
                 break;
@@ -112,7 +169,7 @@ std::string Board::showBoard() {
 bool Board::equalsTo(Board boardToCheck) {
     for (int i = 0; i < size; i++) {
         for (int j = 0; j < size; j++) {
-            if (this->board[i][j] != boardToCheck.board[i][j]) {
+            if (this->board[i][j]->color != boardToCheck.board[i][j]->color) {
                 return false;
             }
         }
