@@ -19,6 +19,14 @@ void Board::init(int size) {
     this->board.resize(size, std::vector<spot_color>(size, EMPTY));
 }
 
+/**
+ * Defines '-' operator of StonePosition
+ * Distance between two positions
+ */
+StonePosition operator-(const StonePosition& pos1, const StonePosition& pos2) {
+    return {(pos1.row - pos2.row), (pos1.col - pos2.col)};
+}
+
 bool Board::move(Game* game, StonePosition *pos, spot_color color) {
     if (!this->legal(pos, color)) {
         return false;
@@ -58,6 +66,10 @@ int Board::getSize() {
 
 bool Board::isOver() {
     return gameOver;
+}
+
+void Board::group() {
+
 }
 
 

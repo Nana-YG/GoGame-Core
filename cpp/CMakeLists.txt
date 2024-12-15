@@ -26,6 +26,8 @@ add_executable(GTP-Core
         Config.h
         gtp.cpp
         gtp.h
+        GroupUtil.cpp
+        GroupUtil.h
 )
 
 # link nlohmann/json to project
