@@ -74,10 +74,10 @@ std::string Board::showBoard() {
     oss << "\n";
 
     // Iterate the entire board
-    for (int i = 0; i < size; ++i) {
+    for (int i = (size - 1); i >= 0; i--) {
         oss << (i + 1) << " ";
         if (i + 1 < 10) oss << " "; // If <row number> < 10, add on more space
-        for (int j = 0; j < size; ++j) {
+        for (int j = 0; j < size; j++) {
             switch (board[i][j]) {
                 case WHITE:
                     oss << "O "; // White

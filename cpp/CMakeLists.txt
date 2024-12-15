@@ -4,7 +4,6 @@ project(GTP-Core)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_BUILD_TYPE Debug)
 
-
 # include FetchContent module
 include(FetchContent)
 
@@ -15,7 +14,7 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(json)
 
-add_executable(MyAlphaGo
+add_executable(GTP-Core
         main.cpp
         Player.cpp
         Player.h

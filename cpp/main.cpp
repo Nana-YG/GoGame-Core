@@ -8,7 +8,7 @@
 int main() {
     // Load configuration
     Config& config = Config::getInstance();
-    if (!config.loadFromFile("/home/nana/Gyyyyy/Projects/MyAlphaGo/cpp/config.json")) {
+    if (!config.loadFromFile("/home/nana/Gyyyyy/Projects/GTP-Core/cpp/config.json")) {
         std::cerr << "Failed to load configuration. Using default settings." << std::endl;
     }
 

@@ -46,7 +46,7 @@ public:
     int getSize();										// Board size
     bool isOver();										// Game is over
     std::string showBoard();                            // Print the board to a String
-    bool equalsTo(Board boardToCheck);                 // Check is this->board is equal to boardToCheck->board
+    bool equalsTo(Board boardToCheck);                  // Check is this->board is equal to boardToCheck->board
 
 };
 
