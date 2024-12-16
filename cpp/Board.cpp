@@ -34,8 +34,28 @@ void Board::init(int size) {
     }
 }
 
-void Board::clearGroup() {
 
+void Board::clearGroup() {
+    std::unordered_set<Group*> uniqueGroups;
+
+    // Collect all unique groups
+    for (int i = 0; i < size; i++) {
+        for (int j = 0; j < size; j++) {
+            if (board[i][j]->group != nullptr) {
+                uniqueGroups.insert(board[i][j]->group);
+                board[i][j]->group = nullptr; // Clear the group pointer
+            }
+        }
+    }
+
+    // Delete all unique groups
+    for (Group* group : uniqueGroups) {
+        delete group;
+    }
+
+    // Clear group containers
+    whiteGroups.clear();
+    blackGroups.clear();
 }
 
 /**
