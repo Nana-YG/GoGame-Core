@@ -35,7 +35,7 @@ void Board::init(int size) {
 }
 
 
-void Board::clearGroup() {
+void Board::clearGroups() {
     std::unordered_set<Group*> uniqueGroups;
 
     // Collect all unique groups
@@ -80,7 +80,7 @@ bool Board::move(Game* game, StonePosition *pos, spot_color color) {
 
 bool Board::legal(StonePosition *pos, spot_color color) {
     // Check range
-    if (pos->row < 0 || pos->row >= this->size || pos->col < 0 || pos->col >= this->size) {
+    if (!isInBounds(pos->row, pos->col)) {
         return false;
     }
 
@@ -89,7 +89,8 @@ bool Board::legal(StonePosition *pos, spot_color color) {
         return false;
     }
 
-    // TODO: 可扩展检查逻辑，如全局同型规则等
+    // TODO: Extend logic to include rules like Superko (global repetition rule).
+
     return true;
 }
 
@@ -107,7 +108,7 @@ Board Board::update(StonePosition *pos, spot_color color) {
 
         std::unordered_set<Group*> visitedGroups;
         // Ensure neighbor is within bounds
-        if (ni >= 0 && ni < size && nj >= 0 && nj < size) {
+        if (isInBounds(ni, nj)) {
             // Capture and subtract: Check if the neighbor belongs to the opponent group
             if (board[ni][nj]->color != EMPTY && board[ni][nj]->color != board[pos->row][pos->col]->color) {
                 Group* neighborGroup = board[ni][nj]->group;
@@ -128,7 +129,7 @@ Board Board::update(StonePosition *pos, spot_color color) {
             }
         }
     }
-    group();
+    groupStones();
     countLiberties();
 
     return newBoard;
@@ -193,90 +194,106 @@ void Board::addGroup(Group* group) {
     }
     return;
 }
+void Board::groupStones() {
+    clearGroups();
 
-void Board::group() {
-    clearGroup();
     for (int i = 0; i < size; i++) {
         for (int j = 0; j < size; j++) {
-            if (board[i][j]->color == EMPTY) {
-                continue;
-            }
+            if (board[i][j]->color == EMPTY) continue;
+
             Group* newGroup = createNewGroup(i, j);
             addGroup(newGroup);
-            if (i > 0) {
-                if (board[i][j]->color == board[i - 1][j]->color) {
-                    Group* toRemove1 = board[i][j]->group;
-                    Group* toRemove2 = board[i - 1][j]->group;
-                    Group* combinedGroup = combined(board[i][j]->group, board[i - 1][j]->group, 2);
-                    removeGroup(toRemove1);
-                    removeGroup(toRemove2);
-                    addGroup(combinedGroup);
-                }
-            }
-            if (j > 0) {
-                if (board[i][j]->color == board[i][j - 1]->color) {
-                    Group* toRemove1 = board[i][j]->group;
-                    Group* toRemove2 = board[i][j - 1]->group;
-                    Group* combinedGroup = combined(board[i][j]->group, board[i][j - 1]->group, 2);
-                    removeGroup(toRemove1);
-                    removeGroup(toRemove2);
-                    addGroup(combinedGroup);
-                }
+
+            // Check neighbors and combine groups
+            checkAndCombineGroups(i, j, i - 1, j); // Check above
+            checkAndCombineGroups(i, j, i, j - 1); // Check left
+        }
+    }
+}
+
+// Helper function to combine groups if colors match
+void Board::checkAndCombineGroups(int x1, int y1, int x2, int y2) {
+    if (isInBounds(x2, y2) && board[x1][y1]->color == board[x2][y2]->color) {
+        Group* group1 = board[x1][y1]->group;
+        Group* group2 = board[x2][y2]->group;
+
+        if (group1 != group2) {
+            Group* combinedGroup = combined(group1, group2, 2);
+            removeGroup(group1);
+            removeGroup(group2);
+            addGroup(combinedGroup);
+        }
+    }
+}
+
+// Helper function: Update liberties for a given empty space
+void Board::updateLibertiesForEmptySpace(int x, int y) {
+    // Directions: up, down, left, right
+    const int dx[4] = {-1, 1, 0, 0};
+    const int dy[4] = {0, 0, -1, 1};
+
+    std::unordered_set<Group*> visitedGroups; // Track already processed groups
+
+    for (int d = 0; d < 4; d++) {
+        int ni = x + dx[d];
+        int nj = y + dy[d];
+
+        if (!isInBounds(ni, nj)) continue; // Boundary check
+
+        if (board[ni][nj]->color != EMPTY) {
+            Group* neighborGroup = board[ni][nj]->group;
+
+            // Increase liberty count only once per group
+            if (visitedGroups.insert(neighborGroup).second) {
+                neighborGroup->liberty++;
             }
         }
     }
 }
 
+// Helper function: Check if coordinates are within board boundaries
+bool Board::isInBounds(int x, int y) const {
+    return x >= 0 && x < size && y >= 0 && y < size;
+}
+
+// Main function: Calculate the liberties for all groups
 void Board::countLiberties() {
-    // Clear the liberties of all groups first
+    clearLiberties(); // Reset liberty count for all groups
+
+    // Traverse the board to find empty spaces and update liberties
+    for (int i = 0; i < size; i++) {
+        for (int j = 0; j < size; j++) {
+            if (board[i][j]->color == EMPTY) {
+                updateLibertiesForEmptySpace(i, j);
+            }
+        }
+    }
+}
+
+// Helper function: Reset liberty count for all groups
+void Board::clearLiberties() {
     for (Group* group : whiteGroups) {
         group->liberty = 0;
     }
     for (Group* group : blackGroups) {
         group->liberty = 0;
     }
+}
 
-    // Directions for checking neighbors (up, down, left, right)
-    const int dx[4] = {-1, 1, 0, 0};
-    const int dy[4] = {0, 0, -1, 1};
-
-    // Traverse the board
-    for (int i = 0; i < size; i++) {
-        for (int j = 0; j < size; j++) {
-            // Check if the cell is empty
-            if (board[i][j]->color == EMPTY) {
-                // Use a set to track the groups around this empty space
-                std::unordered_set<Group*> visitedGroups;
-
-                // Check its four neighbors
-                for (int d = 0; d < 4; d++) {
-                    int ni = i + dx[d];
-                    int nj = j + dy[d];
-
-                    // Ensure neighbor is within bounds
-                    if (ni >= 0 && ni < size && nj >= 0 && nj < size) {
-                        // Check if the neighbor belongs to a group
-                        if (board[ni][nj]->color != EMPTY) {
-                            Group* neighborGroup = board[ni][nj]->group;
-
-                            // Only increase liberty if this group hasn't been visited
-                            if (visitedGroups.find(neighborGroup) == visitedGroups.end()) {
-                                neighborGroup->liberty++;
-                                visitedGroups.insert(neighborGroup);
-                            }
-                        }
-                    }
-                }
-            }
-        }
+std::string Board::cellToString(Stone* stone) const {
+    switch (stone->color) {
+        case WHITE: return "O ";
+        case BLACK: return "X ";
+        case EMPTY: default: return ". ";
     }
 }
+
 
 std::string Board::showBoard() {
 
     std::ostringstream oss;
 
-    // Column mark: GTP format first line
+    // Print column mark: GTP format first line
     oss << "   "; // White space padding
     for (int i = 0; i < this->size; i++) {
         char colMark = 'A' + i;
@@ -284,25 +301,13 @@ std::string Board::showBoard() {
     }
     oss << "\n";
 
-    // Iterate the entire board
-    for (int i = (size - 1); i >= 0; i--) {
-        oss << (i + 1) << " ";
-        if (i + 1 < 10) oss << " "; // If <row number> < 10, add on more space
+    // Print rows
+    for (int i = size - 1; i >= 0; i--) {
+        oss << (i + 1) << (i + 1 < 10 ? "  " : " ");
         for (int j = 0; j < size; j++) {
-            switch (board[i][j]->color) {
-                case WHITE:
-                    oss << "O "; // White
-                break;
-                case BLACK:
-                    oss << "X "; // Black
-                break;
-                case EMPTY:
-                    default:
-                        oss << ". "; // Empty
-                break;
-            }
+            oss << cellToString(board[i][j]);
         }
-        oss << "\n"; // Next line
+        oss << "\n";
     }
     return oss.str();
 }
@@ -322,8 +327,6 @@ std::string Board::showLiberties() {
     }
     return oss.str(); // Return the generated string
 }
-
-
 
 bool Board::equalsTo(Board boardToCheck) {
     for (int i = 0; i < size; i++) {

@@ -64,7 +64,7 @@ public:
     // ~Board();
     void init(int size);								// Initialize Go Board
     void clear();                                       // Clear the board and all data (Groups and stones)
-    void clearGroup();                                  // Clear group-related data
+    void clearGroups();                                  // Clear group-related data
     int getSize();										// Board size
     bool isOver();										// Game is over
     std::vector<std::vector<Stone*>> getBoard();        // Get the board
@@ -74,13 +74,19 @@ public:
     Group* createNewGroup(int row, int col);            // Create a new group and add it into the list
     void removeGroup(Group* group);                     // Remove input group from group list
     void addGroup(Group* group);                        // Group add group to whiteGroups/blackGroups
-    void group();                                       // Group all stones on the board, DO NOT use for update, use update() instead. This is for manually assigned board.
+    void groupStones();                                       // Group all stones on the board, DO NOT use for update, use update() instead. This is for manually assigned board.
+    void checkAndCombineGroups(int x1, int y1, int x2, int y2); // Helper function: Combine groups if colors match
+    void updateLibertiesForEmptySpace(int x, int y);    // Helper function: Update liberties for a given empty space
     void countLiberties();                              // Count the liberties of each group
+    bool isInBounds(int x, int y) const;                // Helper function: Check if coordinates are within board boundaries
+    void clearLiberties();                              // Helper function: Reset liberty count for all groups
+    std::string cellToString(Stone* stone) const;       // Helper function: Stone ==> '.' 'X' 'O'
     std::string showBoard();                            // Print the board to a String
     std::string showLiberties();                        // Print the board in form of liberties
     bool equalsTo(Board boardToCheck);                  // Check is this->board is equal to boardToCheck->board
     std::vector<std::vector<spot_color>> boardMatrix;   // Output the board to matrix of (-1, 0, 1)
     std::vector<std::vector<int>> libertyMatrix;        // Show libertyMatrix
+
 
 };
 
