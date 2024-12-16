@@ -82,6 +82,7 @@ bool Board::move(Game* game, StonePosition *pos, spot_color color) {
 }
 
 bool Board::legal(StonePosition *pos, spot_color color) {
+
     // Check range
     if (!isInBounds(pos->row, pos->col)) {
         return false;
@@ -92,7 +93,7 @@ bool Board::legal(StonePosition *pos, spot_color color) {
         return false;
     }
 
-    // TODO: Extend logic to include rules like Superko (global repetition rule).
+    // Self-kill
 
     return true;
 }
