@@ -19,14 +19,14 @@ private:
     std::string rule;
     float komi{};
     int moveCount;
-    std::vector<Board> history;
+    std::vector<std::string*> history;
 
 public:
     Game(Player * playerB, Player * playerW);
     void init();
     int getMoveCount();
     void addBoard(Board board);
-    Board getBoardFromHist(int index);
+    std::string getBoardFromHist(int index);
     bool superko(Board board);
 };
 

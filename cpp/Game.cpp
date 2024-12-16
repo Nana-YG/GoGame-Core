@@ -16,7 +16,6 @@ void Game::init() {
     rule = config.rule;
     komi = config.komi;
     moveCount = 0;
-    history.resize(300);
 }
 
 int Game::getMoveCount() {
@@ -24,20 +23,24 @@ int Game::getMoveCount() {
 }
 
 void Game::addBoard(Board board) {
-    history[moveCount] = board;
+    // Convert the board to a string representation
+    std::string* boardStr = new std::string(board.showBoard());
+
+    // Add the new string to the history
+    history.push_back(boardStr);
     moveCount++;
 }
 
-Board Game::getBoardFromHist(int index) {
-    return this->history[index];
+std::string Game::getBoardFromHist(int index) {
+    return *(this->history[index]);
 }
 
 bool Game::superko(Board board) {
-    // for (int i = 0; i < moveCount; i++) {
-    //     if (board.equalsTo(getBoardFromHist(i))) {
-    //         return true; // Repeated board state
-    //     }
-    // }
+    for (int i = 0; i < moveCount; i++) {
+        if (board.showBoard() == getBoardFromHist(i)) {
+            return true; // Repeated board state
+        }
+    }
     return false;
 }
 
