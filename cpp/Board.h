@@ -55,8 +55,8 @@ private:
     std::vector<std::vector<Stone*>> board;
     int size;
     bool gameOver;
-    std::vector<Group> whiteGroups;
-    std::vector<Group> blackGroups;
+    std::vector<Group*> whiteGroups;
+    std::vector<Group*> blackGroups;
 
 
 public:
@@ -70,10 +70,15 @@ public:
     bool move(Game* game, StonePosition * pos, spot_color color);	// Play a move of <color> at <*pos>, return 1 if proceeded, return 0 if illegal
     bool legal(StonePosition *pos, spot_color color);	// Is a move at <row, col> legal
     Board update(StonePosition* pos, spot_color color); // Update the board for groups, captures, liberties, etc.
-    void group();                                       // Group all stones on the board, DO NOT use for update, use update() instead. This is for manually assigned board.
     Group* createNewGroup(int row, int col);            // Create a new group and add it into the list
+    void removeGroup(Group* group);                     // Remove input group from group list
+    void addGroup(Group* group);                        // Group add group to whiteGroups/blackGroups
+    void group();                                       // Group all stones on the board, DO NOT use for update, use update() instead. This is for manually assigned board.
+    void countLiberties();                              // Count the liberties of each group
     std::string showBoard();                            // Print the board to a String
     bool equalsTo(Board boardToCheck);                  // Check is this->board is equal to boardToCheck->board
+    std::vector<std::vector<spot_color>> boardMatrix;   // Output the board to matrix of (-1, 0, 1)
+    std::vector<std::vector<int>> libertyMatrix;        // Show libertyMatrix
 
 };
 

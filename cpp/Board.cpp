@@ -98,10 +98,46 @@ Group* Board::createNewGroup(int row, int col) {
     board[row][col]->group = newGroup;
 
     newGroup->stones.push_back(board[row][col]);
+
+    if (newGroup->color == WHITE) {
+        whiteGroups.push_back(newGroup);
+    } else if (newGroup->color == BLACK) {
+        blackGroups.push_back(newGroup);
+    }
+
     return newGroup;
 }
 
+void Board::removeGroup(Group* inputGroup) {
+    if (inputGroup->color == WHITE) {
+        for (auto it = whiteGroups.begin(); it != whiteGroups.end(); ++it) {
+            if (*it == inputGroup) {
+                whiteGroups.erase(it);
+                break;
+            }
+        }
+    } else if (inputGroup->color == BLACK) {
+        for (auto it = blackGroups.begin(); it != blackGroups.end(); ++it) {
+            if (*it == inputGroup) {
+                blackGroups.erase(it);
+                break;
+            }
+        }
+    }
+}
 
+void Board::addGroup(Group* inputGroup) {
+    if (inputGroup->color == WHITE) {
+        whiteGroups.push_back(inputGroup);
+        return;
+    }
+    if (inputGroup->color == BLACK) {
+        blackGroups.push_back(inputGroup);
+        return;
+    }
+    return;
+
+}
 
 void Board::group() {
     for (int i = 0; i < size; i++) {
@@ -115,13 +151,17 @@ void Board::group() {
             if (i > 0) {
                 if (board[i][j]->color == board[i - 1][j]->color) {
                     Group* combinedGroup = combined(board[i][j]->group, board[i - 1][j]->group, 2);
-                    // TODO remove the old groups from the list
+                    removeGroup(board[i][j]->group);
+                    removeGroup(board[i - 1][j]->group);
+                    addGroup(combinedGroup);
                 }
             }
             if (j > 0) {
                 if (board[i][j]->color == board[i][j - 1]->color) {
                     Group* combinedGroup = combined(board[i][j]->group, board[i][j - 1]->group, 2);
-                    //TODO remove the old groups from the list
+                    removeGroup(board[i][j]->group);
+                    removeGroup(board[i][j - 1]->group);
+                    addGroup(combinedGroup);
                 }
             }
 
