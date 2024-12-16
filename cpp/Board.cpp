@@ -34,6 +34,8 @@ void Board::init(int size) {
     }
 }
 
+void Board::clear() {
+}
 
 void Board::clearGroups() {
     std::unordered_set<Group*> uniqueGroups;
@@ -70,11 +72,12 @@ bool Board::move(Game* game, StonePosition *pos, spot_color color) {
     if (!this->legal(pos, color)) {
         return false;
     }
-    Board newBoard = this->update(pos, color);
-    if (game->superko(newBoard)) {
+    std::vector<std::vector<spot_color>> oldState = boardMatrix();
+    this->update(pos, color);
+    if (game->superko(*this)) {
+        readBoardFromMatrix(oldState);
         return false;
     }
-    this->board = newBoard.board;
     return true;
 }
 
@@ -94,9 +97,9 @@ bool Board::legal(StonePosition *pos, spot_color color) {
     return true;
 }
 
-Board Board::update(StonePosition *pos, spot_color color) {
-    Board newBoard(*this);
-    newBoard.board[pos->row][pos->col]->color = color;
+void Board::update(StonePosition *pos, spot_color color) {
+
+    board[pos->row][pos->col]->color = color;
 
     const int dx[4] = {-1, 1, 0, 0};
     const int dy[4] = {0, 0, -1, 1};
@@ -132,7 +135,6 @@ Board Board::update(StonePosition *pos, spot_color color) {
     groupStones();
     countLiberties();
 
-    return newBoard;
 }
 
 int Board::getSize() {
@@ -194,6 +196,7 @@ void Board::addGroup(Group* group) {
     }
     return;
 }
+
 void Board::groupStones() {
     clearGroups();
 
@@ -338,3 +341,90 @@ bool Board::equalsTo(Board boardToCheck) {
     }
     return true;
 }
+
+std::vector<std::vector<spot_color>> Board::boardMatrix() {
+
+    std::vector<std::vector<spot_color>> result(size, std::vector<spot_color>(size)); // Initialize a matrix
+
+    for (int i = 0; i < size; i++) {
+        for (int j = 0; j < size; j++) {
+            result[i][j] = board[i][j]->color; // Copy color from board
+        }
+    }
+
+    return result;
+}
+
+
+void Board::readBoardFromMatrix(const std::vector<std::vector<spot_color>> matrix) {
+    if (matrix.size() != size || matrix[0].size() != size) {
+        throw std::invalid_argument("Matrix dimensions do not match the board size.");
+    }
+
+    for (int i = 0; i < size; i++) {
+        for (int j = 0; j < size; j++) {
+            board[i][j]->color = matrix[i][j]; // Update each stone's color
+        }
+    }
+
+    // Recalculate groups and liberties after updating the board
+    groupStones();
+    countLiberties();
+}
+
+void Board::readBoardFromString(const std::string boardString) {
+    std::istringstream iss(boardString);
+    std::string line;
+    int rowIndex = size - 1; // Start from the last row (size-1)
+
+    while (std::getline(iss, line)) {
+        // Skip the first line with column markers
+        if (line.empty() || line[0] == ' ') {
+            continue;
+        }
+
+        std::istringstream lineStream(line);
+        int rowLabel;
+        lineStream >> rowLabel; // Read the row label (e.g., 10, 9, ...)
+
+        for (int colIndex = 0; colIndex < size; colIndex++) {
+            char cell;
+            lineStream >> cell; // Read each cell in the row
+
+            // Update the board based on the character
+            switch (cell) {
+                case 'X':
+                    board[rowIndex][colIndex]->color = BLACK;
+                break;
+                case 'O':
+                    board[rowIndex][colIndex]->color = WHITE;
+                break;
+                case '.':
+                    board[rowIndex][colIndex]->color = EMPTY;
+                break;
+                default:
+                    throw std::invalid_argument("Invalid boardString format.");
+            }
+        }
+        rowIndex--; // Move to the next row
+    }
+}
+
+
+std::vector<std::vector<int>> Board::libertyMatrix() {
+    // Initialize a 2D vector with the same dimensions as the board
+    std::vector<std::vector<int>> result(size, std::vector<int>(size, 0));
+
+    // Traverse the board
+    for (int i = 0; i < size; i++) {
+        for (int j = 0; j < size; j++) {
+            // If the position is not empty, get the group's liberty
+            if (board[i][j]->color != EMPTY) {
+                result[i][j] = board[i][j]->group->liberty;
+            }
+        }
+    }
+
+    return result;
+}
+
