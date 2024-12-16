@@ -18,16 +18,16 @@ Group* combined(std::vector<Group*> groups, int offset) {
     newGroup->color = groups[0]->color;
 
     // Combine stones and calculate liberties
-    newGroup->liberties = offset; // Start with offset for the connecting stone
+    newGroup->liberty = offset; // Start with offset for the connecting stone
     for (const auto& group : groups) {
         // Add stones from the group
         newGroup->stones.insert(newGroup->stones.end(), group->stones.begin(), group->stones.end());
         // Sum up liberties
-        newGroup->liberties += group->liberties;
+        newGroup->liberty += group->liberty;
     }
 
     // Adjust liberties: subtract the connecting spot (equal to the number of groups)
-    newGroup->liberties -= groups.size();
+    newGroup->liberty -= groups.size();
 
     // Update the group pointer for each stone in the new group
     for (Stone* stone : newGroup->stones) {
@@ -50,7 +50,7 @@ Group* combined(Group* group1, Group* group2, int offset) {
     }
 
     // Combine liberties
-    newGroup->liberties = group1->liberties + group2->liberties + offset - 2;
+    newGroup->liberty = group1->liberty + group2->liberty + offset - 2;
 
     return newGroup;
 }
@@ -69,7 +69,7 @@ Group* combined(Group* group1, Group* group2, Group* group3, int offset) {
     }
 
     // Combine liberties
-    newGroup->liberties = group1->liberties + group2->liberties + group3->liberties + offset - 3;
+    newGroup->liberty = group1->liberty + group2->liberty + group3->liberty + offset - 3;
 
     return newGroup;
 }
@@ -89,7 +89,7 @@ Group* combined(Group* group1, Group* group2, Group* group3, Group* group4, int 
     }
 
     // Combine liberties
-    newGroup->liberties = group1->liberties + group2->liberties + group3->liberties + group4->liberties + offset - 4;
+    newGroup->liberty = group1->liberty + group2->liberty + group3->liberty + group4->liberty + offset - 4;
 
     return newGroup;
 }

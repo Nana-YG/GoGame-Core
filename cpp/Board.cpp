@@ -8,6 +8,7 @@
 #include "GroupUtil.h"
 #include <sstream>
 #include <string>
+#include <unordered_set>
 
 Board::Board() {
     const Config& config = Config::getInstance();
@@ -33,7 +34,7 @@ void Board::init(int size) {
     }
 }
 
-void Board::clear() {
+void Board::clearGroup() {
 
 }
 
@@ -75,6 +76,41 @@ bool Board::legal(StonePosition *pos, spot_color color) {
 Board Board::update(StonePosition *pos, spot_color color) {
     Board newBoard(*this);
     newBoard.board[pos->row][pos->col]->color = color;
+
+    const int dx[4] = {-1, 1, 0, 0};
+    const int dy[4] = {0, 0, -1, 1};
+
+    // Check its four neighbors
+    for (int d = 0; d < 4; d++) {
+        int ni = pos->row + dx[d];
+        int nj = pos->col + dy[d];
+
+        std::unordered_set<Group*> visitedGroups;
+        // Ensure neighbor is within bounds
+        if (ni >= 0 && ni < size && nj >= 0 && nj < size) {
+            // Capture and subtract: Check if the neighbor belongs to the opponent group
+            if (board[ni][nj]->color != EMPTY && board[ni][nj]->color != board[pos->row][pos->col]->color) {
+                Group* neighborGroup = board[ni][nj]->group;
+
+                // Only decrease liberty if this group hasn't been visited
+                if (visitedGroups.find(neighborGroup) == visitedGroups.end()) {
+                    neighborGroup->liberty--;
+                    visitedGroups.insert(neighborGroup);
+                }
+                // Remove captured stones if liberty decreases to 0
+                if (neighborGroup->liberty == 0) {
+                    for (Stone* stone : neighborGroup->stones) {
+                        stone->color = EMPTY;
+                        stone->group = nullptr;
+                    }
+                    removeGroup(neighborGroup);
+                }
+            }
+        }
+    }
+    group();
+    countLiberties();
+
     return newBoard;
 }
 
@@ -92,7 +128,7 @@ std::vector<std::vector<Stone*>> Board::getBoard() {
 
 Group* Board::createNewGroup(int row, int col) {
     Group* newGroup = new Group();
-    newGroup->liberties = 0;
+    newGroup->liberty = 0;
     newGroup->color = board[row][col]->color;
 
     board[row][col]->group = newGroup;
@@ -126,49 +162,95 @@ void Board::removeGroup(Group* inputGroup) {
     }
 }
 
-void Board::addGroup(Group* inputGroup) {
-    if (inputGroup->color == WHITE) {
-        whiteGroups.push_back(inputGroup);
+void Board::addGroup(Group* group) {
+    if (group->color == WHITE) {
+        whiteGroups.push_back(group);
         return;
     }
-    if (inputGroup->color == BLACK) {
-        blackGroups.push_back(inputGroup);
+    if (group->color == BLACK) {
+        blackGroups.push_back(group);
         return;
     }
     return;
-
 }
 
 void Board::group() {
+    clearGroup();
     for (int i = 0; i < size; i++) {
         for (int j = 0; j < size; j++) {
             if (board[i][j]->color == EMPTY) {
                 continue;
             }
-
             Group* newGroup = createNewGroup(i, j);
-
+            addGroup(newGroup);
             if (i > 0) {
                 if (board[i][j]->color == board[i - 1][j]->color) {
+                    Group* toRemove1 = board[i][j]->group;
+                    Group* toRemove2 = board[i - 1][j]->group;
                     Group* combinedGroup = combined(board[i][j]->group, board[i - 1][j]->group, 2);
-                    removeGroup(board[i][j]->group);
-                    removeGroup(board[i - 1][j]->group);
+                    removeGroup(toRemove1);
+                    removeGroup(toRemove2);
                     addGroup(combinedGroup);
                 }
             }
             if (j > 0) {
                 if (board[i][j]->color == board[i][j - 1]->color) {
+                    Group* toRemove1 = board[i][j]->group;
+                    Group* toRemove2 = board[i][j - 1]->group;
                     Group* combinedGroup = combined(board[i][j]->group, board[i][j - 1]->group, 2);
-                    removeGroup(board[i][j]->group);
-                    removeGroup(board[i][j - 1]->group);
+                    removeGroup(toRemove1);
+                    removeGroup(toRemove2);
                     addGroup(combinedGroup);
                 }
             }
-
         }
     }
 }
 
+void Board::countLiberties() {
+    // Clear the liberties of all groups first
+    for (Group* group : whiteGroups) {
+        group->liberty = 0;
+    }
+    for (Group* group : blackGroups) {
+        group->liberty = 0;
+    }
+
+    // Directions for checking neighbors (up, down, left, right)
+    const int dx[4] = {-1, 1, 0, 0};
+    const int dy[4] = {0, 0, -1, 1};
+
+    // Traverse the board
+    for (int i = 0; i < size; i++) {
+        for (int j = 0; j < size; j++) {
+            // Check if the cell is empty
+            if (board[i][j]->color == EMPTY) {
+                // Use a set to track the groups around this empty space
+                std::unordered_set<Group*> visitedGroups;
+
+                // Check its four neighbors
+                for (int d = 0; d < 4; d++) {
+                    int ni = i + dx[d];
+                    int nj = j + dy[d];
+
+                    // Ensure neighbor is within bounds
+                    if (ni >= 0 && ni < size && nj >= 0 && nj < size) {
+                        // Check if the neighbor belongs to a group
+                        if (board[ni][nj]->color != EMPTY) {
+                            Group* neighborGroup = board[ni][nj]->group;
+
+                            // Only increase liberty if this group hasn't been visited
+                            if (visitedGroups.find(neighborGroup) == visitedGroups.end()) {
+                                neighborGroup->liberty++;
+                                visitedGroups.insert(neighborGroup);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
 
 std::string Board::showBoard() {
 
@@ -202,9 +284,26 @@ std::string Board::showBoard() {
         }
         oss << "\n"; // Next line
     }
-
     return oss.str();
 }
+
+std::string Board::showLiberties() {
+    std::ostringstream oss;
+    for (int i = 0; i < size; i++) {
+        for (int j = 0; j < size; j++) {
+            if (board[i][j]->color == EMPTY) {
+                oss << ". "; // Empty point
+            } else {
+                // Print the group's liberty count
+                oss << board[i][j]->group->liberty << " ";
+            }
+        }
+        oss << std::endl; // Newline for the next row
+    }
+    return oss.str(); // Return the generated string
+}
+
+
 
 bool Board::equalsTo(Board boardToCheck) {
     for (int i = 0; i < size; i++) {

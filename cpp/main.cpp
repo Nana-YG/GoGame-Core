@@ -28,6 +28,9 @@ int main() {
         // Display board
         std::cout << board.showBoard();
 
+        // std::cout << "Liberties:" << std::endl;
+        // std::cout << board.showLiberties();
+
         // Current player makes a move
         Player* currentPlayer = (game.getMoveCount() % 2 == 0) ? &playerB : &playerW;
         std::cout << currentPlayer->getName() << "'s turn ("
@@ -46,9 +49,8 @@ int main() {
             continue;
         }
 
-        board.group();
-        std::cout << "Linked Board:" << std::endl;
-        printGroups(board);
+        // std::cout << "Linked Board:" << std::endl;
+        // printGroups(board);
 
         // Stop timmer
         auto end = std::chrono::high_resolution_clock::now();

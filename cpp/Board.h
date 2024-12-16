@@ -35,7 +35,7 @@ struct Group;
 
 struct Group {
     spot_color color;
-    int liberties;
+    int liberty;
     std::vector<Stone*> stones;
 };
 
@@ -64,6 +64,7 @@ public:
     // ~Board();
     void init(int size);								// Initialize Go Board
     void clear();                                       // Clear the board and all data (Groups and stones)
+    void clearGroup();                                  // Clear group-related data
     int getSize();										// Board size
     bool isOver();										// Game is over
     std::vector<std::vector<Stone*>> getBoard();        // Get the board
@@ -76,6 +77,7 @@ public:
     void group();                                       // Group all stones on the board, DO NOT use for update, use update() instead. This is for manually assigned board.
     void countLiberties();                              // Count the liberties of each group
     std::string showBoard();                            // Print the board to a String
+    std::string showLiberties();                        // Print the board in form of liberties
     bool equalsTo(Board boardToCheck);                  // Check is this->board is equal to boardToCheck->board
     std::vector<std::vector<spot_color>> boardMatrix;   // Output the board to matrix of (-1, 0, 1)
     std::vector<std::vector<int>> libertyMatrix;        // Show libertyMatrix
