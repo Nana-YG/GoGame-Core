@@ -6,6 +6,8 @@
 #include "Board.h"
 #include "Config.h"
 
+Game::Game() {}
+
 Game::Game(Player *playeB, Player *playerW) {
     this->playeB = playeB;
     this->playerW = playerW;

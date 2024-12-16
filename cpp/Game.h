@@ -22,6 +22,7 @@ private:
     std::vector<std::string*> history;
 
 public:
+    Game();
     Game(Player * playerB, Player * playerW);
     void init();
     int getMoveCount();

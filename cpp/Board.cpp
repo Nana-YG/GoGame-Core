@@ -424,7 +424,6 @@ std::vector<std::vector<int>> Board::libertyMatrix() {
             }
         }
     }
-
     return result;
 }
 

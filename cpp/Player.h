@@ -14,7 +14,10 @@ private:
 
 public:
 
+    Player();                                                       // Default constructor
     Player(const std::string& playerName, spot_color playerColor);  // Constructor
+    void setName(std::string name);
+    void setColor(spot_color color);
     std::string getName() const;                                    // Getter for the player's name
     spot_color getColor() const;                                    // Getter for the player's color
     bool makeMove(Game* game, Board& board, StonePosition pos);     // Make a move on <pos>

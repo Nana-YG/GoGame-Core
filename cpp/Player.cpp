@@ -4,9 +4,20 @@
 #include "Player.h"
 #include <iostream>
 
+// Default constructor
+Player::Player() : name(""), color(EMPTY) {}
+
 // Constructor
 Player::Player(const std::string& playerName, spot_color playerColor)
     : name(playerName), color(playerColor) {}
+
+void Player::setName(std::string name) {
+    this->name = name;
+}
+
+void Player::setColor(spot_color color) {
+    this->color = color;
+}
 
 // Getter for the player's name
 std::string Player::getName() const {
@@ -26,7 +37,6 @@ bool Player::makeMove(Game* game, Board& board, StonePosition pos) {
     }
 
     if (board.move(game, &pos, color)) {
-        std::cout << name << " placed a stone at (" << pos.row << ", " << pos.col << ")." << std::endl;
         return true;
     }
 

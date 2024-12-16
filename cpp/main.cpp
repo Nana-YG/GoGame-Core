@@ -2,12 +2,15 @@
 #include "Board.h"
 #include "Game.h"
 #include "Config.h"
+#include "GTP.h"
 #include <iostream>
 #include <chrono>
+
 
 #include "GroupUtil.h"
 
 int main() {
+    /*
     // Load configuration
     Config& config = Config::getInstance();
     if (!config.loadFromFile("/home/nana/Gyyyyy/Projects/GTP-Core/cpp/config.json")) {
@@ -71,4 +74,11 @@ int main() {
     std::cout << board.showBoard();
 
     return 0;
+    */
+
+    GTP gtp;
+    gtp.run(); // Start the GTP loop
+    return 0;
+
+
 }
