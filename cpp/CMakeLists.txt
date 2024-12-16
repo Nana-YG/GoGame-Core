@@ -15,19 +15,19 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(json)
 
 add_executable(GTP-Core
-        main.cpp
-        Player.cpp
-        Player.h
-        Game.cpp
-        Game.h
-        Board.cpp
-        Board.h
-        Config.cpp
-        Config.h
-        GroupUtil.cpp
-        GroupUtil.h
-        GTP.cpp
-        GTP.h
+        src/main.cpp
+        src/Player.cpp
+        src/Player.h
+        src/Game.cpp
+        src/Game.h
+        src/Board.cpp
+        src/Board.h
+        src/Config.cpp
+        src/Config.h
+        src/GroupUtil.cpp
+        src/GroupUtil.h
+        src/GTP.cpp
+        src/GTP.h
 )
 
 # link nlohmann/json to project
