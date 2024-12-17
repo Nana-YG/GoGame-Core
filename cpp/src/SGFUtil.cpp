@@ -18,7 +18,7 @@
 #include "BS_thread_pool.hpp"
 
 namespace fs = std::filesystem;
-std::mutex coutMutex;
+// std::mutex coutMutex;
 
 void readData(std::string inputDir, std::string outputDir) {
 
@@ -146,7 +146,7 @@ void processOneFile(std::string inputFileName, std::string outputDir) {
         }
 
         // Save the updated matrices and current move information to the HDF5 file
-        std::lock_guard<std::mutex> lock(coutMutex);
+        // std::lock_guard<std::mutex> lock(coutMutex);
         fs::path outputFilePath = fs::path(outputDir) /
                               fs::path(inputFileName).replace_extension(".h5").filename();
         std::string outputFileName = outputFilePath.string();
