@@ -146,13 +146,17 @@ void processOneFile(std::string inputFileName, std::string outputDir) {
         }
 
         // Save the updated matrices and current move information to the HDF5 file
-        saveToHDF5(outputDir, boardMat, libertyMat, pos, i);
+        std::lock_guard<std::mutex> lock(coutMutex);
+        fs::path outputFilePath = fs::path(outputDir) /
+                              fs::path(inputFileName).replace_extension(".h5").filename();
+        std::string outputFileName = outputFilePath.string();
+        saveToHDF5(outputFileName, boardMat, libertyMat, pos, i);
     }
 
     // Lock to write to std out
-    std::lock_guard<std::mutex> lock(coutMutex);
-    std::cout << ">>" << inputFileName << std::endl;
-    std::cout << board.showBoard() << std::endl;
+    // std::lock_guard<std::mutex> lock(coutMutex);
+    // std::cout << ">>" << inputFileName << std::endl;
+    // std::cout << board.showBoard() << std::endl;
 
     board.clear();
     file.close();
@@ -162,8 +166,7 @@ void processOneFile(std::string inputFileName, std::string outputDir) {
 void saveToHDF5(const std::string& hdf5FilePath,
                 const std::vector<std::vector<spot_color>>& boardMatrix,
                 const std::vector<std::vector<int>>& libertyMatrix,
-                const StonePosition& nextMove, int moveIndex)
-{
+                const StonePosition& nextMove, int moveIndex) {
     try {
         // 如果文件不存在则创建，如果存在则追加数据
         H5::H5File file(hdf5FilePath, H5F_ACC_RDWR | H5F_ACC_CREAT);
@@ -194,6 +197,7 @@ void saveToHDF5(const std::string& hdf5FilePath,
         int moveData[2] = {nextMove.row, nextMove.col};
         moveDataset.write(moveData, H5::PredType::NATIVE_INT);
 
+        std::cout << "Wrote to: " << hdf5FilePath << std::endl;
         file.close();
     } catch (H5::Exception& e) {
         std::cerr << "HDF5 Error: " << e.getCDetailMsg() << std::endl;
