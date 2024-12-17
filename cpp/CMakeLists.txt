@@ -13,9 +13,16 @@ FetchContent_Declare(
         URL https://github.com/nlohmann/json/releases/download/v3.11.3/json.tar.xz
 )
 FetchContent_MakeAvailable(json)
+
 # HDF5
-find_package(HDF5 REQUIRED)
+find_package(HDF5 REQUIRED COMPONENTS CXX) # Search for HDF5
+if (HDF5_FOUND)
+    message(STATUS "HDF5 include dir: ${HDF5_INCLUDE_DIRS}")
+    message(STATUS "HDF5 libraries: ${HDF5_LIBRARIES}")
+endif()
+
 include_directories(${HDF5_INCLUDE_DIRS})
+
 include_directories(include)
 
 

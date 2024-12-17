@@ -11,8 +11,12 @@
 #include "Board.h"
 
 void readData(std::string inputDir, std::string outputDir);
-StonePosition convertSGFCoordinate(std::string);
-void processOneFile(std::string fileName);
+StonePosition convertSGFCoordinate(std::string move);
+void processOneFile(std::string inputFileName, std::string outputDir);
+void saveToHDF5(const std::string& hdf5FilePath,
+                const std::vector<std::vector<spot_color>>& boardMatrix,
+                const std::vector<std::vector<int>>& libertyMatrix,
+                const StonePosition& nextMove, int moveIndex);
 
 #endif // SGFUTIL_H
 

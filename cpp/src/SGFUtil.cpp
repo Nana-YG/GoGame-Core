@@ -29,7 +29,7 @@ void readData(std::string inputDir, std::string outputDir) {
     try {
 
         if (fs::is_regular_file(inputDir)) {
-            processOneFile(inputDir);
+            processOneFile(inputDir, outputDir);
             return;
         }
 
@@ -43,10 +43,10 @@ void readData(std::string inputDir, std::string outputDir) {
         // Output read play game on each file
 
         // Process files using multithreading
-        for (const std::string& fileName : files) {
+        for (const std::string& inputFileName : files) {
             futures.push_back(pool.submit_task(
-                [fileName] {
-                    return processOneFile(fileName);
+                [inputFileName, outputDir] {
+                    return processOneFile(inputFileName, outputDir);
                 }));
         }
 
@@ -68,7 +68,7 @@ StonePosition convertSGFCoordinate(std::string move) {
     return pos;
 }
 
-void processOneFile(std::string fileName) {
+void processOneFile(std::string inputFileName, std::string outputDir) {
 
     // Regex pattern
     std::regex pattern(";[BW]\\[[a-z]{2}\\]|;A[WB]\\[[a-z]{2}\\]");
@@ -88,7 +88,7 @@ void processOneFile(std::string fileName) {
 
     std::string line;
     std::vector<std::string> moves;
-    std::ifstream file(fileName);
+    std::ifstream file(inputFileName);
 
     while (std::getline(file, line)) {
         std::sregex_iterator begin(line.begin(), line.end(), pattern), end;
@@ -111,27 +111,91 @@ void processOneFile(std::string fileName) {
         }
         if (move[1] == 'B') {
             if (!playerB.makeMove(&game, board, pos)) {
-                std::cout << "Illegal at >>" << fileName << std::endl;
+                std::cout << "Illegal at >>" << inputFileName << std::endl;
                 std::cout << "The " << i <<" th Move: " << move << std::endl;
             }
         }
         if (move[1] == 'W') {
             if (!playerW.makeMove(&game, board, pos)) {
-                std::cout << "Illegal at >>" << fileName << std::endl;
+                std::cout << "Illegal at >>" << inputFileName << std::endl;
                 std::cout << "The " << i <<" th Move: " << move << std::endl;
             }
         }
         //                std::cout << "---------------------------------------------" << std::endl;
         //                std::cout << board.showBoard() << std::endl;
         //                std::cout << board.showLiberties() << std::endl;
+
+
+        auto boardMat = board.boardMatrix();
+        auto libertyMat = board.libertyMatrix();
+
+        // Check if the current move is for Black (even index i indicates Black's turn)
+        // If it is Black's turn, negate the board and liberty matrices to switch perspective
+        if (move[1] == 'B') { // Black's turn
+            for (auto& row : boardMat) {
+                for (auto& elem : row) {
+                    elem = static_cast<spot_color>(-1 * elem); // Flip board matrix to White's perspective
+                }
+            }
+
+            for (auto& row : libertyMat) {
+                for (auto& elem : row) {
+                    elem *= -1; // Flip liberty matrix to White's perspective
+                }
+            }
+        }
+
+        // Save the updated matrices and current move information to the HDF5 file
+        saveToHDF5(outputDir, boardMat, libertyMat, pos, i);
     }
 
     // Lock to write to std out
     std::lock_guard<std::mutex> lock(coutMutex);
-    std::cout << ">>" << fileName << std::endl;
+    std::cout << ">>" << inputFileName << std::endl;
     std::cout << board.showBoard() << std::endl;
 
     board.clear();
     file.close();
     // Unlocked
+}
+
+void saveToHDF5(const std::string& hdf5FilePath,
+                const std::vector<std::vector<spot_color>>& boardMatrix,
+                const std::vector<std::vector<int>>& libertyMatrix,
+                const StonePosition& nextMove, int moveIndex)
+{
+    try {
+        // 如果文件不存在则创建，如果存在则追加数据
+        H5::H5File file(hdf5FilePath, H5F_ACC_RDWR | H5F_ACC_CREAT);
+
+        // 保存棋盘矩阵 (spot_color)
+        std::string datasetName = "board_" + std::to_string(moveIndex);
+        hsize_t dims[2] = {boardMatrix.size(), boardMatrix[0].size()};
+        H5::DataSpace dataspace(2, dims);
+        H5::DataSet dataset = file.createDataSet(datasetName, H5::PredType::NATIVE_INT, dataspace);
+        std::vector<int> flattenedBoard;
+        for (const auto& row : boardMatrix)
+            flattenedBoard.insert(flattenedBoard.end(), row.begin(), row.end());
+        dataset.write(flattenedBoard.data(), H5::PredType::NATIVE_INT);
+
+        // 保存气矩阵 (libertyMatrix)
+        std::string libertyName = "liberty_" + std::to_string(moveIndex);
+        H5::DataSet libertyDataset = file.createDataSet(libertyName, H5::PredType::NATIVE_INT, dataspace);
+        std::vector<int> flattenedLiberty;
+        for (const auto& row : libertyMatrix)
+            flattenedLiberty.insert(flattenedLiberty.end(), row.begin(), row.end());
+        libertyDataset.write(flattenedLiberty.data(), H5::PredType::NATIVE_INT);
+
+        // 保存下一步坐标
+        std::string moveName = "nextMove_" + std::to_string(moveIndex);
+        hsize_t moveDims[1] = {2};
+        H5::DataSpace moveSpace(1, moveDims);
+        H5::DataSet moveDataset = file.createDataSet(moveName, H5::PredType::NATIVE_INT, moveSpace);
+        int moveData[2] = {nextMove.row, nextMove.col};
+        moveDataset.write(moveData, H5::PredType::NATIVE_INT);
+
+        file.close();
+    } catch (H5::Exception& e) {
+        std::cerr << "HDF5 Error: " << e.getCDetailMsg() << std::endl;
+    }
 }

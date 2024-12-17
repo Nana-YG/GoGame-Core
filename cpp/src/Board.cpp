@@ -360,20 +360,6 @@ bool Board::equalsTo(Board boardToCheck) {
     return true;
 }
 
-std::vector<std::vector<spot_color>> Board::boardMatrix() {
-
-    std::vector<std::vector<spot_color>> result(size, std::vector<spot_color>(size)); // Initialize a matrix
-
-    for (int i = 0; i < size; i++) {
-        for (int j = 0; j < size; j++) {
-            result[i][j] = board[i][j]->color; // Copy color from board
-        }
-    }
-
-    return result;
-}
-
-
 void Board::readBoardFromMatrix(const std::vector<std::vector<spot_color>> matrix) {
     if (matrix.size() != size || matrix[0].size() != size) {
         throw std::invalid_argument("Matrix dimensions do not match the board size.");
@@ -429,6 +415,19 @@ void Board::readBoardFromString(const std::string boardString) {
 }
 
 
+std::vector<std::vector<spot_color>> Board::boardMatrix() {
+
+    std::vector<std::vector<spot_color>> result(size, std::vector<spot_color>(size)); // Initialize a matrix
+
+    for (int i = 0; i < size; i++) {
+        for (int j = 0; j < size; j++) {
+            result[i][j] = board[i][j]->color; // Copy color from board
+        }
+    }
+
+    return result;
+}
+
 std::vector<std::vector<int>> Board::libertyMatrix() {
     // Initialize a 2D vector with the same dimensions as the board
     std::vector<std::vector<int>> result(size, std::vector<int>(size, 0));
@@ -437,8 +436,10 @@ std::vector<std::vector<int>> Board::libertyMatrix() {
     for (int i = 0; i < size; i++) {
         for (int j = 0; j < size; j++) {
             // If the position is not empty, get the group's liberty
-            if (board[i][j]->color != EMPTY) {
+            if (board[i][j]->color == WHITE) {
                 result[i][j] = board[i][j]->group->liberty;
+            } else if (board[i][j]->color == BLACK) {
+                result[i][j] = -(board[i][j]->group->liberty);
             }
         }
     }
