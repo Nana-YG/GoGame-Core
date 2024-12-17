@@ -8,9 +8,6 @@
 #include <iostream>
 #include <chrono>
 
-
-#include "GroupUtil.h"
-
 void saveToHDF5(const std::vector<std::vector<SGFMove>>& allMoves, const std::string& hdf5FilePath);
 
 int main(int argc, char* argv[]) {
@@ -29,7 +26,7 @@ int main(int argc, char* argv[]) {
     }
 
 
-    // 如果有传入路径，使用用户输入的路径
+    // Read *.sgf in [SGF_PATH]/ and output HDF5 file to [HDF5_OUTPUT_PATH]/
     if (mode == "ReadData") {
 
         if (argc < 5) {

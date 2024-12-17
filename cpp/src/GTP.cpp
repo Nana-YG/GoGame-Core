@@ -65,7 +65,7 @@ std::string GTP::handlePlay(const std::vector<std::string>& args) {
         return "? Invalid color";
     }
 
-    StonePosition pos = convertCoordinate(args[1]);
+    StonePosition pos = convertGTPCoordinate(args[1]);
 
     if (color == BLACK) {
         if (!playerB.makeMove(&game, board, pos)) {
@@ -140,7 +140,7 @@ void GTP::run() {
     }
 }
 
-StonePosition GTP::convertCoordinate(std::string stringCoordinate) {
+StonePosition GTP::convertGTPCoordinate(std::string stringCoordinate) {
     StonePosition pos;
     pos.col = stringCoordinate[0] - 'A';
     stringCoordinate.erase(0, 1);

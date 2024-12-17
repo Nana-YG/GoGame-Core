@@ -36,7 +36,7 @@ public:
     GTP();                                                  // Constructor
     void run();                                             // Main loop to handle GTP commands
     std::string processCommand(const std::string& input);   // Process a single GTP command
-    StonePosition convertCoordinate(std::string stringCoordinate);
+    StonePosition convertGTPCoordinate(std::string stringCoordinate);
 };
 
 #endif // GTP_H
