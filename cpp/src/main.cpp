@@ -3,82 +3,51 @@
 #include "Game.h"
 #include "Config.h"
 #include "GTP.h"
+#include "SGFUtil.h"
+#include "H5Cpp.h"
 #include <iostream>
 #include <chrono>
 
 
 #include "GroupUtil.h"
 
-int main() {
-    /*
-    // Load configuration
-    Config& config = Config::getInstance();
-    if (!config.loadFromFile("/home/nana/Gyyyyy/Projects/GTP-Core/cpp/config.json")) {
-        std::cerr << "Failed to load configuration. Using default settings." << std::endl;
+void saveToHDF5(const std::vector<std::vector<SGFMove>>& allMoves, const std::string& hdf5FilePath);
+
+int main(int argc, char* argv[]) {
+
+    if (argc < 2) {
+        std::cerr << "Usage: ./GTP-Core [GTP | ReadData] [SGF_PATH] [HDF5_OUTPUT_PATH]" << std::endl;
+        return 1;
     }
 
-    // Initialize game
-    Board board;
-    Player playerB("Alice", BLACK);
-    Player playerW("Bob", WHITE);
-    Game game(&playerB, &playerW);
-    game.init();
+    std::string mode = argv[1];
 
-    // Start game loop
-    bool gameOver = false;
-    while (!gameOver) {
+    if (mode == "GTP") {
+        std::cout << "Entering GTP Mode..." << std::endl;
+        GTP gtp;
+        gtp.run(); // Start the GTP loop
+    }
 
-        // Display board
-        std::cout << board.showBoard();
 
-        // std::cout << "Liberties:" << std::endl;
-        // std::cout << board.showLiberties();
+    // 如果有传入路径，使用用户输入的路径
+    if (mode == "ReadData") {
 
-        // Current player makes a move
-        Player* currentPlayer = (game.getMoveCount() % 2 == 0) ? &playerB : &playerW;
-        std::cout << currentPlayer->getName() << "'s turn ("
-                  << (currentPlayer->getColor() == BLACK ? "BLACK" : "WHITE") << "):" << std::endl;
-
-        int row, col;
-        std::cout << "Enter your move (row and column): ";
-        std::cin >> row >> col;
-
-        // Start timmer
-        auto start = std::chrono::high_resolution_clock::now();
-
-        StonePosition pos = {row - 1, col - 1}; // Adjust for 0-based indexing
-        if (!currentPlayer->makeMove(&game, board, pos)) {
-            std::cout << "Invalid move. Try again." << std::endl;
-            continue;
+        if (argc < 5) {
+            std::cerr << "Usage: ./GTP-Core ReadData [SGF_PATH] [HDF5_OUTPUT_PATH]" << std::endl;
+            return 1;
         }
 
-        // std::cout << "Linked Board:" << std::endl;
-        // printGroups(board);
+        std::string inputDir = argv[2];
+        std::string outputDir = argv[3];
 
-        // Stop timmer
-        auto end = std::chrono::high_resolution_clock::now();
-        auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
-
-
-        // Time Consume for history query
-        std::cout << "Move processed in " << duration.count() << " μs." << std::endl;
-
-
-        // Update game state
-        game.addBoard(board);
-        gameOver = board.isOver();
+        readData(inputDir, outputDir);
     }
 
-    // Game over
-    std::cout << "Game over! Final board state:" << std::endl;
-    std::cout << board.showBoard();
+    else {
+        std::cerr << "Invalid mode! Use 'GTP' or 'ReadData'." << std::endl;
+        return 1;
+    }
 
     return 0;
-    */
-
-    GTP gtp;
-    gtp.run(); // Start the GTP loop
-    return 0;
-
-
 }
+

@@ -13,6 +13,10 @@ FetchContent_Declare(
         URL https://github.com/nlohmann/json/releases/download/v3.11.3/json.tar.xz
 )
 FetchContent_MakeAvailable(json)
+# HDF5
+find_package(HDF5 REQUIRED)
+include_directories(${HDF5_INCLUDE_DIRS})
+
 
 add_executable(GTP-Core
         src/main.cpp
@@ -28,7 +32,10 @@ add_executable(GTP-Core
         src/GroupUtil.h
         src/GTP.cpp
         src/GTP.h
+        src/SGFUtil.cpp
+        src/SGFUtil.h
 )
 
 # link nlohmann/json to project
 target_link_libraries(GTP-Core PRIVATE nlohmann_json::nlohmann_json)
+target_link_libraries(GTP-Core PRIVATE ${HDF5_LIBRARIES})
