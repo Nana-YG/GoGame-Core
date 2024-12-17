@@ -57,7 +57,15 @@ void readData(std::string inputDir, std::string outputDir) {
                 }
             }
 
-            // TODO for each move: play on the board and store data
+            for (std::string move : moves) {
+                StonePosition pos = convertSGFCoordinate(move);
+                if (move[1] == 'B') {
+                    playerB.makeMove(&game, board, pos);
+                }
+                if (move[1] == 'W') {
+                    playerW.makeMove(&game, board, pos);
+                }
+            }
 
             board.clear();
             file.close();
@@ -67,5 +75,12 @@ void readData(std::string inputDir, std::string outputDir) {
         std::cerr << "Error: " << e.what() << std::endl;
     }
 
+}
+
+StonePosition convertSGFCoordinate(std::string move) {
+    StonePosition pos;
+    pos.col = move[3] - 'a';
+    pos.row = 19 - (move[4] - 'a') - 1;
+    return pos;
 }
 

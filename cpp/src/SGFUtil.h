@@ -5,18 +5,13 @@
 #ifndef SGFUTIL_H
 #define SGFUTIL_H
 
+#include "Board.h"
 #include <string>
 #include <vector>
 #include <filesystem>
 
-// SGF 解析结果存储结构
-struct SGFMove {
-    std::string player;
-    int row;
-    int col;
-};
-
 void readData(std::string inputDir, std::string outputDir);
+StonePosition convertSGFCoordinate(std::string);
 
 #endif // SGFUTIL_H
 
