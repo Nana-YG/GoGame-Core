@@ -1,8 +1,10 @@
 //
 // Created by Yunyi Gao on 12/12/24.
 //
-#include "Player.h"
+
 #include <iostream>
+#include "Player.h"
+
 
 // Default constructor
 Player::Player() : name(""), color(EMPTY) {}
@@ -32,7 +34,7 @@ spot_color Player::getColor() const {
 // Make a move on the board
 bool Player::makeMove(Game* game, Board& board, StonePosition pos) {
     if (!board.legal(&pos, color)) {
-        std::cout << "Move is illegal. Try again, " << name << "!" << std::endl;
+        std::cout << "Move is illegal." << std::endl;
         return false;
     }
 

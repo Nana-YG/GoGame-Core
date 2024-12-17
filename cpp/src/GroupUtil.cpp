@@ -2,11 +2,11 @@
 // Created by nana on 12/15/24.
 //
 
-#include "Board.h"
 #include <iostream>
 #include <vector>
 #include <string>
 #include <iomanip>
+#include "Board.h"
 
 /**
  * The connecting stone must be put at an empty spot, which is counted

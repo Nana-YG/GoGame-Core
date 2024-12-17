@@ -16,6 +16,7 @@ FetchContent_MakeAvailable(json)
 # HDF5
 find_package(HDF5 REQUIRED)
 include_directories(${HDF5_INCLUDE_DIRS})
+include_directories(include)
 
 
 add_executable(GTP-Core

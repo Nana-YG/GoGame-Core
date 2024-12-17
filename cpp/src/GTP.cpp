@@ -2,13 +2,13 @@
 // Created by nana on 12/16/24.
 //
 
+#include <string>
+#include <iostream>
+#include <vector>
 #include "GTP.h"
 #include "Game.h"
 #include "Board.h"
 #include "Player.h"
-#include <string>
-#include <iostream>
-#include <vector>
 
 GTP::GTP() {
     boardsize = 19;

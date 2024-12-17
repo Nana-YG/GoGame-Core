@@ -4,9 +4,9 @@
 
 #ifndef GROUPUTIL_H
 #define GROUPUTIL_H
-
-#include "Board.h"
 #include <vector>
+#include "Board.h"
+
 
 Group* combined(std::vector<Group*> groups, int offset);
 Group* combined(Group* group1, Group* group2, int offset);

@@ -2,13 +2,14 @@
 // Created by Yunyi Gao on 12/12/24.
 //
 
+#include <sstream>
+#include <string>
+#include <unordered_set>
+#include <iostream>
 #include "Board.h"
 #include "Game.h"
 #include "Config.h"
 #include "GroupUtil.h"
-#include <sstream>
-#include <string>
-#include <unordered_set>
 
 Board::Board() {
     const Config& config = Config::getInstance();
@@ -16,12 +17,14 @@ Board::Board() {
 }
 
 // Board::~Board() {
-//     for (int i = 0; i < size; ++i) {
-//         for (int j = 0; j < size; ++j) {
-//             delete this->board[i][j];
+//     clearGroups();
+//     for (auto& row : board) {
+//         for (Stone* stone : row) {
+//             delete stone;
 //         }
 //     }
 // }
+
 
 void Board::init(int size) {
     this->size = size;
@@ -36,11 +39,14 @@ void Board::init(int size) {
 
 void Board::clear() {
     clearGroups();
-    for (int i = 0; i < size; i++) {
-        for (int j = 0; j < size; j++) {
-            board[i][j]->color = EMPTY;
+
+    for (auto& row : board) {
+        for (auto& stone : row) {
+            delete stone;
         }
+        row.clear();
     }
+    board.clear();
 }
 
 void Board::clearGroups() {
@@ -91,11 +97,15 @@ bool Board::legal(StonePosition *pos, spot_color color) {
 
     // Check range
     if (!isInBounds(pos->row, pos->col)) {
+        std::cout << "Input row:" << pos->row << " col:" << pos->col << " is out of range" << std::endl;
         return false;
     }
 
     // Check if the spot is empty
     if (this->board[pos->row][pos->col]->color != EMPTY) {
+        std::cout << "Input position row:" << pos->row << " col:" << pos->col<< " is not empty" << std::endl;
+        std::cout << "Current Board:" << std::endl << showBoard() << std::endl;
+        // std::cout << "Current Liberties:" << std::endl << showLiberties() << std::endl;
         return false;
     }
 
@@ -111,12 +121,13 @@ void Board::update(StonePosition *pos, spot_color color) {
     const int dx[4] = {-1, 1, 0, 0};
     const int dy[4] = {0, 0, -1, 1};
 
+    std::unordered_set<Group*> visitedGroups;
+
     // Check its four neighbors
     for (int d = 0; d < 4; d++) {
         int ni = pos->row + dx[d];
         int nj = pos->col + dy[d];
 
-        std::unordered_set<Group*> visitedGroups;
         // Ensure neighbor is within bounds
         if (isInBounds(ni, nj)) {
             // Capture and subtract: Check if the neighbor belongs to the opponent group
@@ -124,10 +135,10 @@ void Board::update(StonePosition *pos, spot_color color) {
                 Group* neighborGroup = board[ni][nj]->group;
 
                 // Only decrease liberty if this group hasn't been visited
-                if (visitedGroups.find(neighborGroup) == visitedGroups.end()) {
+                if (visitedGroups.insert(neighborGroup).second) { // 插入成功才进行操作
                     neighborGroup->liberty--;
-                    visitedGroups.insert(neighborGroup);
                 }
+
                 // Remove captured stones if liberty decreases to 0
                 if (neighborGroup->liberty == 0) {
                     for (Stone* stone : neighborGroup->stones) {
@@ -141,8 +152,8 @@ void Board::update(StonePosition *pos, spot_color color) {
     }
     groupStones();
     countLiberties();
-
 }
+
 
 int Board::getSize() {
     return size;
@@ -324,7 +335,7 @@ std::string Board::showBoard() {
 
 std::string Board::showLiberties() {
     std::ostringstream oss;
-    for (int i = 0; i < size; i++) {
+    for (int i = size - 1; i >= 0; i--) {
         for (int j = 0; j < size; j++) {
             if (board[i][j]->color == EMPTY) {
                 oss << ". "; // Empty point
