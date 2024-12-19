@@ -213,20 +213,6 @@ void mergeHDF5(const std::string& inputDir, const std::string& outputFilePath) {
     }
 }
 
-int main(int argc, char* argv[]) {
-    if (argc != 3) {
-        std::cerr << "Usage: " << argv[0] << " <input_dir> <output_file>" << std::endl;
-        return 1;
-    }
-
-    std::string inputDir = argv[1];
-    std::string outputFilePath = argv[2];
-
-    mergeHDF5(inputDir, outputFilePath);
-
-    return 0;
-}
-
 void saveToHDF5(const std::string& hdf5FilePath,
                 const std::vector<std::vector<spot_color>>& boardMatrix,
                 const std::vector<std::vector<int>>& libertyMatrix,
