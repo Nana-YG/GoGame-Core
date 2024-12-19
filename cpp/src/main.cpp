@@ -40,6 +40,26 @@ int main(int argc, char* argv[]) {
         // Start timer
         auto start = std::chrono::high_resolution_clock::now();
 
+        mergeHDF5(inputDir, outputDir);
+
+        // Stop timer
+        auto end = std::chrono::high_resolution_clock::now();
+        auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
+        std::cout << "Time taken by readData: " << duration.count() << " ms" << std::endl;
+    }
+
+    if (mode == "Merge") {
+        if (argc < 4) {
+            std::cerr << "Usage: ./GTP-Core ReadData [SGF_PATH] [HDF5_OUTPUT_PATH]" << std::endl;
+            return 1;
+        }
+
+        std::string inputDir = argv[2];
+        std::string outputDir = argv[3];
+
+        // Start timer
+        auto start = std::chrono::high_resolution_clock::now();
+
         readData(inputDir, outputDir);
 
         // Stop timer
