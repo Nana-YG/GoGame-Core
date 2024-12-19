@@ -50,7 +50,7 @@ int main(int argc, char* argv[]) {
 
     if (mode == "Merge") {
         if (argc < 4) {
-            std::cerr << "Usage: ./GTP-Core ReadData [SGF_PATH] [HDF5_OUTPUT_PATH]" << std::endl;
+            std::cerr << "Usage: ./GTP-Core Merge [SGF_PATH] [HDF5_OUTPUT_PATH]" << std::endl;
             return 1;
         }
 
@@ -60,12 +60,12 @@ int main(int argc, char* argv[]) {
         // Start timer
         auto start = std::chrono::high_resolution_clock::now();
 
-        readData(inputDir, outputDir);
+        mergeHDF5(inputDir, outputDir);
 
         // Stop timer
         auto end = std::chrono::high_resolution_clock::now();
         auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
-        std::cout << "Time taken by readData: " << duration.count() << " ms" << std::endl;
+        std::cout << "Time taken by mergeHDF5: " << duration.count() << " ms" << std::endl;
     }
 
     else {
