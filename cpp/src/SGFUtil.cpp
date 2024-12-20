@@ -165,53 +165,43 @@ void processOneFile(std::string inputFileName, std::string outputDir) {
 
 void mergeHDF5(const std::string& inputDir, const std::string& outputFilePath) {
     try {
-        // Create or open the target HDF5 file
         H5::H5File outputFile(outputFilePath, H5F_ACC_TRUNC);
 
-        // Iterate over all HDF5 files in the input directory
         for (const auto& entry : fs::recursive_directory_iterator(inputDir)) {
             if (entry.is_regular_file() && entry.path().extension() == ".h5") {
                 std::string inputFilePath = entry.path().string();
-                std::string groupName = entry.path().stem().string(); // Use file name (without extension) as group name
+                std::string groupName = entry.path().stem().string();
 
-                // Open the input HDF5 file
                 H5::H5File inputFile(inputFilePath, H5F_ACC_RDONLY);
-
-                // Create a group in the output file for this input file
                 H5::Group group = outputFile.createGroup("/" + groupName);
 
-                // Copy datasets from input file to the group in the output file
-                for (const auto& datasetName : {"board", "liberty", "nextMove"}) {
-                    if (H5Lexists(inputFile.getId(), datasetName, H5P_DEFAULT)) {
-                        H5::DataSet dataset = inputFile.openDataSet(datasetName);
+                H5::Group root = inputFile.openGroup("/");
+                for (hsize_t i = 0; i < root.getNumObjs(); i++) {
+                    std::string datasetName = root.getObjnameByIdx(i);
+                    if (root.getObjTypeByIdx(i) == H5G_DATASET) {
+                        H5::DataSet dataset = root.openDataSet(datasetName);
                         H5::DataSpace dataspace = dataset.getSpace();
+
                         H5::DataSet outputDataset = group.createDataSet(datasetName, dataset.getDataType(), dataspace);
 
                         std::vector<char> data(dataset.getInMemDataSize());
                         dataset.read(data.data(), dataset.getDataType());
                         outputDataset.write(data.data(), dataset.getDataType());
-                    } else {
-                        std::cerr << "Warning: Dataset " << datasetName << " not found in " << inputFilePath << std::endl;
                     }
                 }
 
-                std::cout << "Merged file: " << inputFilePath << " into group: " << groupName << std::endl;
-
-                // Close input file
                 inputFile.close();
             }
         }
 
-        // Close output file
         outputFile.close();
         std::cout << "All HDF5 files have been merged into: " << outputFilePath << std::endl;
 
     } catch (const H5::Exception& e) {
         std::cerr << "HDF5 Error: " << e.getDetailMsg() << std::endl;
-    } catch (const std::exception& e) {
-        std::cerr << "Error: " << e.what() << std::endl;
     }
 }
+
 
 void saveToHDF5(const std::string& hdf5FilePath,
                 const std::vector<std::vector<spot_color>>& boardMatrix,
