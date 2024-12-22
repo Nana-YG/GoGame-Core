@@ -171,31 +171,31 @@ void mergeHDF5(const std::string& inputDir, const std::string& outputFilePath) {
             if (entry.is_regular_file() && entry.path().extension() == ".h5") {
                 std::string inputFilePath = entry.path().string();
                 std::string groupName = entry.path().stem().string();
-
-                try {
-                    H5::H5File inputFile(inputFilePath, H5F_ACC_RDONLY);
-                    H5::Group group = outputFile.createGroup("/" + groupName);
-
-                    H5::Group root = inputFile.openGroup("/");
-                    for (hsize_t i = 0; i < root.getNumObjs(); i++) {
-                        std::string datasetName = root.getObjnameByIdx(i);
-                        if (root.getObjTypeByIdx(i) == H5G_DATASET) {
-                            H5::DataSet dataset = root.openDataSet(datasetName);
-                            H5::DataSpace dataspace = dataset.getSpace();
-
-                            H5::DataSet outputDataset = group.createDataSet(datasetName, dataset.getDataType(), dataspace);
-
-                            std::vector<char> data(dataset.getInMemDataSize());
-                            dataset.read(data.data(), dataset.getDataType());
-                            outputDataset.write(data.data(), dataset.getDataType());
-                        }
-                    }
-
-                    inputFile.close();
-                    std::cout << "Successfully merged file: " << inputFilePath << " into group: " << groupName << std::endl;
-                } catch (const H5::Exception& e) {
-                    std::cerr << "Failed to merge file: " << inputFilePath << ". Error: " << e.getDetailMsg() << std::endl;
-                }
+                std::cout << "File name: " << inputFilePath << std::endl;
+                // try {
+                //     H5::H5File inputFile(inputFilePath, H5F_ACC_RDONLY);
+                //     H5::Group group = outputFile.createGroup("/" + groupName);
+                //
+                //     H5::Group root = inputFile.openGroup("/");
+                //     for (hsize_t i = 0; i < root.getNumObjs(); i++) {
+                //         std::string datasetName = root.getObjnameByIdx(i);
+                //         if (root.getObjTypeByIdx(i) == H5G_DATASET) {
+                //             H5::DataSet dataset = root.openDataSet(datasetName);
+                //             H5::DataSpace dataspace = dataset.getSpace();
+                //
+                //             H5::DataSet outputDataset = group.createDataSet(datasetName, dataset.getDataType(), dataspace);
+                //
+                //             std::vector<char> data(dataset.getInMemDataSize());
+                //             dataset.read(data.data(), dataset.getDataType());
+                //             outputDataset.write(data.data(), dataset.getDataType());
+                //         }
+                //     }
+                //
+                //     inputFile.close();
+                //     std::cout << "Successfully merged file: " << inputFilePath << " into group: " << groupName << std::endl;
+                // } catch (const H5::Exception& e) {
+                //     std::cerr << "Failed to merge file: " << inputFilePath << ". Error: " << e.getDetailMsg() << std::endl;
+                // }
             }
         }
 
