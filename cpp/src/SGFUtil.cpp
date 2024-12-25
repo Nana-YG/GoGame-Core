@@ -201,6 +201,8 @@ void mergeHDF5(const std::string& inputDir, const std::string& outputFilePath) {
                                 continue; // Skip unexpected datasets
                             }
 
+                            std::cout << "Dataset name: " << outputDatasetName << std::endl;
+
                             // Create the dataset in the output file
                             H5::DataSet outputDataset = outputFile.createDataSet(
                                 outputDatasetName, dataset.getDataType(), dataspace
