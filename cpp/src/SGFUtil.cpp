@@ -165,40 +165,66 @@ void processOneFile(std::string inputFileName, std::string outputDir) {
 
 void mergeHDF5(const std::string& inputDir, const std::string& outputFilePath) {
     try {
+        // Create the output HDF5 file
         H5::H5File outputFile(outputFilePath, H5F_ACC_TRUNC);
+
+        // Initialize a global index for naming datasets
+        size_t globalIndex = 0;
 
         for (const auto& entry : fs::recursive_directory_iterator(inputDir)) {
             if (entry.is_regular_file() && entry.path().extension() == ".h5") {
                 std::string inputFilePath = entry.path().string();
-                std::string groupName = entry.path().stem().string();
-
                 try {
+                    // Open the input HDF5 file
                     H5::H5File inputFile(inputFilePath, H5F_ACC_RDONLY);
-                    H5::Group group = outputFile.createGroup("/" + groupName);
 
+                    // Open the root group of the input file
                     H5::Group root = inputFile.openGroup("/");
+
                     for (hsize_t i = 0; i < root.getNumObjs(); i++) {
                         std::string datasetName = root.getObjnameByIdx(i);
+
                         if (root.getObjTypeByIdx(i) == H5G_DATASET) {
+                            // Open the dataset from the input file
                             H5::DataSet dataset = root.openDataSet(datasetName);
                             H5::DataSpace dataspace = dataset.getSpace();
 
-                            H5::DataSet outputDataset = group.createDataSet(datasetName, dataset.getDataType(), dataspace);
+                            // Determine the appropriate output dataset name based on globalIndex
+                            std::string outputDatasetName;
+                            if (datasetName.find("board") != std::string::npos) {
+                                outputDatasetName = "board_" + std::to_string(globalIndex);
+                            } else if (datasetName.find("liberty") != std::string::npos) {
+                                outputDatasetName = "liberty_" + std::to_string(globalIndex);
+                            } else if (datasetName.find("nextMove") != std::string::npos) {
+                                outputDatasetName = "nextMove_" + std::to_string(globalIndex);
+                            } else {
+                                continue; // Skip unexpected datasets
+                            }
 
+                            // Create the dataset in the output file
+                            H5::DataSet outputDataset = outputFile.createDataSet(
+                                outputDatasetName, dataset.getDataType(), dataspace
+                            );
+
+                            // Read data from the input dataset
                             std::vector<char> data(dataset.getInMemDataSize());
                             dataset.read(data.data(), dataset.getDataType());
+
+                            // Write data to the output dataset
                             outputDataset.write(data.data(), dataset.getDataType());
                         }
                     }
 
+                    // Increment the global index for the next group of datasets
+                    globalIndex++;
+
                     inputFile.close();
-                    std::cout << "Successfully merged file: " << inputFilePath << " into group: " << groupName << std::endl;
+                    std::cout << "Successfully merged file: " << inputFilePath << "\n";
                 } catch (const H5::Exception& e) {
                     std::cerr << "Failed to merge file: " << inputFilePath << ". Error: " << e.getDetailMsg() << std::endl;
                 }
             }
         }
-
 
         outputFile.close();
         std::cout << "All HDF5 files have been merged into: " << outputFilePath << std::endl;
@@ -214,10 +240,10 @@ void saveToHDF5(const std::string& hdf5FilePath,
                 const std::vector<std::vector<int>>& libertyMatrix,
                 const StonePosition& nextMove, int moveIndex) {
     try {
-        // 如果文件不存在则创建，如果存在则追加数据
+        // Create if doesn't exist, append if exists
         H5::H5File file(hdf5FilePath, H5F_ACC_RDWR | H5F_ACC_CREAT);
 
-        // 保存棋盘矩阵 (spot_color)
+        // Save board matrix
         std::string datasetName = "board_" + std::to_string(moveIndex);
         hsize_t dims[2] = {boardMatrix.size(), boardMatrix[0].size()};
         H5::DataSpace dataspace(2, dims);
@@ -227,7 +253,7 @@ void saveToHDF5(const std::string& hdf5FilePath,
             flattenedBoard.insert(flattenedBoard.end(), row.begin(), row.end());
         dataset.write(flattenedBoard.data(), H5::PredType::NATIVE_INT);
 
-        // 保存气矩阵 (libertyMatrix)
+        // Save liberty matrix
         std::string libertyName = "liberty_" + std::to_string(moveIndex);
         H5::DataSet libertyDataset = file.createDataSet(libertyName, H5::PredType::NATIVE_INT, dataspace);
         std::vector<int> flattenedLiberty;
@@ -235,7 +261,7 @@ void saveToHDF5(const std::string& hdf5FilePath,
             flattenedLiberty.insert(flattenedLiberty.end(), row.begin(), row.end());
         libertyDataset.write(flattenedLiberty.data(), H5::PredType::NATIVE_INT);
 
-        // 保存下一步坐标
+        // Save label
         std::string moveName = "nextMove_" + std::to_string(moveIndex);
         hsize_t moveDims[1] = {2};
         H5::DataSpace moveSpace(1, moveDims);
