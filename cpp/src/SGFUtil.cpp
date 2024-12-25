@@ -164,69 +164,57 @@ void processOneFile(std::string inputFileName, std::string outputDir) {
 }
 
 void mergeHDF5(const std::string& inputDir, const std::string& outputFilePath) {
-    try {
-        // Create the output HDF5 file
-        H5::H5File outputFile(outputFilePath, H5F_ACC_TRUNC);
 
-        // Initialize a global index for naming datasets
-        size_t globalBoardIndex = 0;
-        size_t globaLibertyIndex = 0;
-        size_t globalNextMoveIndex = 0;
+    size_t globalIndex = 0;
+
+    try {
+        H5::H5File outputFile(outputFilePath, H5F_ACC_TRUNC);
 
         for (const auto& entry : fs::recursive_directory_iterator(inputDir)) {
             if (entry.is_regular_file() && entry.path().extension() == ".h5") {
                 std::string inputFilePath = entry.path().string();
+                std::string groupName = entry.path().stem().string();
+
+
                 try {
-                    // Open the input HDF5 file
                     H5::H5File inputFile(inputFilePath, H5F_ACC_RDONLY);
+                    H5::Group group = outputFile.createGroup("/" + groupName);
 
-                    // Open the root group of the input file
+                    // Add the startingIndex dataset
+                    {
+                        H5::DataSpace attrSpace(H5S_SCALAR);
+                        H5::DataSet startIndexDataset = group.createDataSet(
+                            "startingIndex", H5::PredType::NATIVE_ULLONG, attrSpace
+                        );
+                        size_t writeIndex = globalIndex / 3;
+                        startIndexDataset.write(&writeIndex, H5::PredType::NATIVE_ULLONG);
+                        std::cout << "Index = " << std::to_string(writeIndex) << std::endl;
+                    }
+
                     H5::Group root = inputFile.openGroup("/");
-
                     for (hsize_t i = 0; i < root.getNumObjs(); i++) {
                         std::string datasetName = root.getObjnameByIdx(i);
-
                         if (root.getObjTypeByIdx(i) == H5G_DATASET) {
-                            // Open the dataset from the input file
                             H5::DataSet dataset = root.openDataSet(datasetName);
                             H5::DataSpace dataspace = dataset.getSpace();
 
-                            // Determine the appropriate output dataset name based on globalIndex
-                            std::string outputDatasetName;
-                            if (datasetName.find("board") != std::string::npos) {
-                                outputDatasetName = "board_" + std::to_string(globalBoardIndex++);
-                            } else if (datasetName.find("liberty") != std::string::npos) {
-                                outputDatasetName = "liberty_" + std::to_string(globaLibertyIndex++);
-                            } else if (datasetName.find("nextMove") != std::string::npos) {
-                                outputDatasetName = "nextMove_" + std::to_string(globalNextMoveIndex++);
-                            } else {
-                                continue; // Skip unexpected datasets
-                            }
+                            H5::DataSet outputDataset = group.createDataSet(datasetName, dataset.getDataType(), dataspace);
 
-                            // std::cout << "Dataset name: " << outputDatasetName << std::endl;
-
-                            // Create the dataset in the output file
-                            H5::DataSet outputDataset = outputFile.createDataSet(
-                                outputDatasetName, dataset.getDataType(), dataspace
-                            );
-
-                            // Read data from the input dataset
                             std::vector<char> data(dataset.getInMemDataSize());
                             dataset.read(data.data(), dataset.getDataType());
-
-                            // Write data to the output dataset
                             outputDataset.write(data.data(), dataset.getDataType());
+                            globalIndex++;
                         }
                     }
 
-
                     inputFile.close();
-                    std::cout << "Successfully merged file: " << inputFilePath << "\n";
+                    std::cout << "Successfully merged file: " << inputFilePath << " into group: " << groupName << std::endl;
                 } catch (const H5::Exception& e) {
                     std::cerr << "Failed to merge file: " << inputFilePath << ". Error: " << e.getDetailMsg() << std::endl;
                 }
             }
         }
+
 
         outputFile.close();
         std::cout << "All HDF5 files have been merged into: " << outputFilePath << std::endl;
