@@ -169,7 +169,9 @@ void mergeHDF5(const std::string& inputDir, const std::string& outputFilePath) {
         H5::H5File outputFile(outputFilePath, H5F_ACC_TRUNC);
 
         // Initialize a global index for naming datasets
-        size_t globalIndex = 0;
+        size_t globalBoardIndex = 0;
+        size_t globaLibertyIndex = 0;
+        size_t globalNextMoveIndex = 0;
 
         for (const auto& entry : fs::recursive_directory_iterator(inputDir)) {
             if (entry.is_regular_file() && entry.path().extension() == ".h5") {
@@ -192,11 +194,11 @@ void mergeHDF5(const std::string& inputDir, const std::string& outputFilePath) {
                             // Determine the appropriate output dataset name based on globalIndex
                             std::string outputDatasetName;
                             if (datasetName.find("board") != std::string::npos) {
-                                outputDatasetName = "board_" + std::to_string(globalIndex);
+                                outputDatasetName = "board_" + std::to_string(globalBoardIndex++);
                             } else if (datasetName.find("liberty") != std::string::npos) {
-                                outputDatasetName = "liberty_" + std::to_string(globalIndex);
+                                outputDatasetName = "liberty_" + std::to_string(globaLibertyIndex++);
                             } else if (datasetName.find("nextMove") != std::string::npos) {
-                                outputDatasetName = "nextMove_" + std::to_string(globalIndex);
+                                outputDatasetName = "nextMove_" + std::to_string(globalNextMoveIndex++);
                             } else {
                                 continue; // Skip unexpected datasets
                             }
@@ -217,8 +219,6 @@ void mergeHDF5(const std::string& inputDir, const std::string& outputFilePath) {
                         }
                     }
 
-                    // Increment the global index for the next group of datasets
-                    globalIndex++;
 
                     inputFile.close();
                     std::cout << "Successfully merged file: " << inputFilePath << "\n";
