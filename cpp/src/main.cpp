@@ -40,7 +40,7 @@ int main(int argc, char* argv[]) {
         // Start timer
         auto start = std::chrono::high_resolution_clock::now();
 
-        mergeHDF5(inputDir, outputDir);
+        readData(inputDir, outputDir);
 
         // Stop timer
         auto end = std::chrono::high_resolution_clock::now();
