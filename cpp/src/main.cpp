@@ -46,6 +46,8 @@ int main(int argc, char* argv[]) {
         auto end = std::chrono::high_resolution_clock::now();
         auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
         std::cout << "Time taken by readData: " << duration.count() << " ms" << std::endl;
+
+        return 0;
     }
 
     if (mode == "Merge") {
@@ -66,6 +68,8 @@ int main(int argc, char* argv[]) {
         auto end = std::chrono::high_resolution_clock::now();
         auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
         std::cout << "Time taken by mergeHDF5: " << duration.count() << " ms" << std::endl;
+
+        return 0;
     }
 
     else {
