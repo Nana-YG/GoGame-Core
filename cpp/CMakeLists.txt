@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.28)
-project(GTP-Core)
+project(GoGame-Core)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_BUILD_TYPE Debug)
@@ -26,7 +26,7 @@ include_directories(${HDF5_INCLUDE_DIRS})
 include_directories(include)
 
 
-add_executable(GTP-Core
+add_executable(GoGame-Core
         src/main.cpp
         src/Player.cpp
         src/Player.h
@@ -45,5 +45,5 @@ add_executable(GTP-Core
 )
 
 # link nlohmann/json to project
-target_link_libraries(GTP-Core PRIVATE nlohmann_json::nlohmann_json)
-target_link_libraries(GTP-Core PRIVATE ${HDF5_LIBRARIES})
+target_link_libraries(GoGame-Core PRIVATE nlohmann_json::nlohmann_json)
+target_link_libraries(GoGame-Core PRIVATE ${HDF5_LIBRARIES})
