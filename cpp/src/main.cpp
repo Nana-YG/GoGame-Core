@@ -13,7 +13,7 @@
 int main(int argc, char* argv[]) {
 
     if (argc < 2) {
-        std::cerr << "Usage: ./GTP-Core [GTP | ReadData] [SGF_PATH] [HDF5_OUTPUT_PATH]" << std::endl;
+        std::cerr << "Usage: ./GoGame-Core [GTP | ReadData] [SGF_PATH] [HDF5_OUTPUT_PATH]" << std::endl;
         return 1;
     }
 
@@ -30,7 +30,7 @@ int main(int argc, char* argv[]) {
     if (mode == "ReadData") {
 
         if (argc < 4) {
-            std::cerr << "Usage: ./GTP-Core ReadData [SGF_PATH] [HDF5_OUTPUT_PATH]" << std::endl;
+            std::cerr << "Usage: ./GoGame-Core ReadData [SGF_PATH] [HDF5_OUTPUT_PATH]" << std::endl;
             return 1;
         }
 
@@ -52,7 +52,7 @@ int main(int argc, char* argv[]) {
 
     if (mode == "Merge") {
         if (argc < 4) {
-            std::cerr << "Usage: ./GTP-Core Merge [SGF_PATH] [HDF5_OUTPUT_PATH]" << std::endl;
+            std::cerr << "Usage: ./GoGame-Core Merge [SGF_PATH] [HDF5_OUTPUT_PATH]" << std::endl;
             return 1;
         }
 
